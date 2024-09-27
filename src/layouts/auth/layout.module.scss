@@ -1,0 +1,16 @@
+.siderLogo {
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  margin: 2px 4px;
+}
+
+.siderStyle {
+  overflow: auto;
+  position: fixed;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  scrollbar-width: thin;
+  scrollbar-color: unset;
+}

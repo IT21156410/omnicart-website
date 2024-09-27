@@ -1,10 +1,17 @@
 import {Navigate, useOutlet} from "react-router-dom";
-import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {useAuth} from "../../hooks/useAuth.tsx";
+import {HeaderLayout} from "./Header.tsx";
+import {useState} from "react";
+import {Breadcrumb, Layout, theme} from "antd";
+import {Content} from "antd/es/layout/layout";
+import {Sidebar} from "./SideBar.tsx";
 
 export const ProtectedLayout = () => {
     const {user, is2FAVerified} = useAuth();
     const outlet = useOutlet();
+
+    const [collapsed, setCollapsed] = useState(false);
+    const {token: {colorBgContainer, borderRadiusLG},} = theme.useToken();
 
     if (!user) {
         return <Navigate to="/"/>;
@@ -14,37 +21,31 @@ export const ProtectedLayout = () => {
         return <Navigate to="/verify-2fa"/>;
     }
     return (
-        <div>
-            <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
-                <Container>
-                    <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
-                    <Navbar.Collapse id="responsive-navbar-nav">
-                        <Nav className="me-auto">
-                            <Nav.Link href="#features">Features</Nav.Link>
-                            <Nav.Link href="#pricing">Pricing</Nav.Link>
-                            <NavDropdown title="Dropdown" id="collapsible-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.2">
-                                    Another action
-                                </NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                                <NavDropdown.Divider/>
-                                <NavDropdown.Item href="#action/3.4">
-                                    Separated link
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        </Nav>
-                        <Nav>
-                            <Nav.Link href="#deets">More deets</Nav.Link>
-                            <Nav.Link eventKey={2} href="#memes">
-                                Dank memes
-                            </Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
-            {outlet}
-        </div>
+        <Layout hasSider>
+            <Sidebar collapsed={collapsed}/>
+            <Layout style={{marginInlineStart: 200}}>
+                <HeaderLayout collapsed={collapsed} setCollapsed={setCollapsed}/>
+                <Breadcrumb
+                    className="ms-3"
+                    items={[{title: 'Home'}, {title: 'Dashboard'}]}
+                    style={{margin: '16px 0'}}
+                />
+                <Content style={{margin: '24px 16px 0', overflow: 'initial'}}>
+                    <div
+                        style={{
+                            padding: 24,
+                            minHeight: "74vh",
+                            background: colorBgContainer,
+                            borderRadius: borderRadiusLG,
+                        }}
+                    >  {outlet}
+                    </div>
+                </Content>
+                <Layout.Footer style={{textAlign: 'center'}}>
+                    OmniCart ©{new Date().getFullYear()}
+                </Layout.Footer>
+            </Layout>
+        </Layout>
+
     );
 };
