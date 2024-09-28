@@ -11,7 +11,7 @@ export const Verify2FA = () => {
         e.preventDefault();
         const isValid = await verify2FACode(code);
         if (isValid) {
-            navigate("/super-admin/dashboard");
+            navigate("/admin/dashboard");
         } else {
             alert("Invalid code. Please try again.");
         }

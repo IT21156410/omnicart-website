@@ -17,7 +17,7 @@ export const LoginPage = () => {
         // For the sake of this example, we're using a mock authentication
         if (username === "user" && password === "password") {
             // Replace with actual authentication logic
-            await login({id: 1, name: "test", email: "test@test.com"});
+            await login({id: 1, name: "test", email: "test@test.com", role: "admin"});
         } else {
             alert("Invalid username or password");
         }

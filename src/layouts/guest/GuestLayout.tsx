@@ -7,7 +7,7 @@ export const GuestLayout = () => {
     const outlet = useOutlet();
 
     if (user && is2FAVerified) {
-        return <Navigate to="/super-admin/dashboard" replace/>;
+        return <Navigate to="/admin/dashboard" replace/>;
     }
 
     return (

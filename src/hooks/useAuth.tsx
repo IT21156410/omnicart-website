@@ -35,7 +35,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         //Mock verification logic
         if (code === "0000") {  // TODO: implement
             setIs2FAVerified(true);
-            navigate("/super-admin/dashboard"); // Navigate to a protected route after successful 2FA
+            navigate("/admin/dashboard"); // Navigate to a protected route after successful 2FA
             return true;
         }
         return false;

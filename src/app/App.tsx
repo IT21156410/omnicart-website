@@ -8,13 +8,14 @@ import {Verify2FA} from "./auth/Verify2FA.tsx";
 import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
 import {Root} from "../layouts/Root.tsx";
 import {User} from "../types";
+import UserManagement from "./dashboard/admin/users/Page.tsx";
 
 const getUserData = () =>
     new Promise((resolve) =>
         setTimeout(() => {
             const user = window.localStorage.getItem("user");
             resolve(user ? JSON.parse(user) as User : null);
-        }, 3000)
+        }, 1000)
     );
 
 export const router = createBrowserRouter(
@@ -29,8 +30,9 @@ export const router = createBrowserRouter(
                 <Route path="/login" element={<LoginPage/>}/>
             </Route>
 
-            <Route path="/super-admin" element={<ProtectedLayout/>}>
+            <Route path="/admin" element={<ProtectedLayout/>}>
                 <Route path="dashboard" element={<Dashboard/>}/>
+                <Route path="users" element={<UserManagement/>}/>
                 {/*<Route path="profile" element={<ProfilePage/>}/>*/}
                 {/*<Route path="settings" element={<SettingsPage/>}/>*/}
             </Route>
