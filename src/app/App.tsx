@@ -9,6 +9,7 @@ import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
 import {Root} from "../layouts/Root.tsx";
 import {User} from "../types";
 import UserManagement from "./dashboard/admin/users/Page.tsx";
+import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 
 const getUserData = () =>
     new Promise((resolve) =>
@@ -30,11 +31,16 @@ export const router = createBrowserRouter(
                 <Route path="/login" element={<LoginPage/>}/>
             </Route>
 
-            <Route path="/admin" element={<ProtectedLayout/>}>
-                <Route path="dashboard" element={<Dashboard/>}/>
-                <Route path="users" element={<UserManagement/>}/>
-                {/*<Route path="profile" element={<ProfilePage/>}/>*/}
-                {/*<Route path="settings" element={<SettingsPage/>}/>*/}
+            <Route element={<ProtectedLayout/>}>
+                <Route path="/admin">
+                    <Route path="dashboard" element={<Dashboard/>}/>
+                    <Route path="users" element={<UserManagement/>}/>
+                    {/*<Route path="profile" element={<ProfilePage/>}/>*/}
+                    {/*<Route path="settings" element={<SettingsPage/>}/>*/}
+                </Route>
+                <Route path="/vendor">
+                    <Route path="products/create" element={<CreateProduct/>}/>
+                </Route>
             </Route>
         </Route>
     )

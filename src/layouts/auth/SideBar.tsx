@@ -1,5 +1,11 @@
 import React from 'react';
-import {AppstoreOutlined, SettingOutlined, UsergroupAddOutlined} from "@ant-design/icons";
+import {
+    AppstoreOutlined,
+    CodepenOutlined,
+    ProductOutlined,
+    SettingOutlined,
+    UsergroupAddOutlined
+} from "@ant-design/icons";
 import sideBarStyles from './layout.module.scss'
 import {useLocation, useNavigate} from "react-router-dom";
 
@@ -9,6 +15,14 @@ const {Header, Sider, Content} = Layout;
 export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const openSubMenuKeys = [];
+
+    switch (location.pathname) {
+        case "/vendor/products/create":
+            openSubMenuKeys.push('products')
+            break;
+        default:
+    }
 
     const {token: {colorBgContainer, borderRadiusLG},} = theme.useToken();
     return (
@@ -26,6 +40,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                 theme="light"
                 mode="inline"
                 defaultSelectedKeys={[location.pathname]}
+                defaultOpenKeys={openSubMenuKeys}
                 style={{borderRight: 0}}
                 items={[
                     {
@@ -39,7 +54,19 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                         icon: <UsergroupAddOutlined/>,
                         label: 'User Management',
                         onClick: () => navigate("/admin/users")
-
+                    },
+                    {
+                        key: 'products',
+                        icon: <ProductOutlined/>,
+                        label: 'Product',
+                        children: [
+                            {
+                                key: "/vendor/products/create",
+                                icon: <CodepenOutlined/>,
+                                label: 'Add Product',
+                                onClick: () => navigate("/vendor/products/create")
+                            },
+                        ]
                     },
                     {
                         key: '3',

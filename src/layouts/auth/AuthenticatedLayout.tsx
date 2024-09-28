@@ -32,18 +32,18 @@ export const ProtectedLayout = () => {
                     items={[{title: 'Home'}, {title: 'Dashboard'}]}
                     style={{margin: '16px 0'}}
                 />
-                <Content style={{margin: '24px 16px 0', overflow: 'initial'}}>
+                <Content style={{margin: '0 16px 0', overflow: 'initial'}}>
                     <div
                         style={{
-                            padding: 24,
+                            padding: '10px 16px 20px',
                             minHeight: "74vh",
-                            background: colorBgContainer,
+                            // background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}
                     >  {outlet}
                     </div>
                 </Content>
-                <Layout.Footer style={{textAlign: 'center'}}>
+                <Layout.Footer style={{background: colorBgContainer,textAlign: 'center'}}>
                     OmniCart ©{new Date().getFullYear()}
                 </Layout.Footer>
             </Layout>
