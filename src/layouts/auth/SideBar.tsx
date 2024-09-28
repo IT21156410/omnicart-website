@@ -1,10 +1,11 @@
 import React from 'react';
-import Sider from "antd/es/layout/Sider";
-import {Menu, theme} from "antd";
 import {AppstoreOutlined, SettingOutlined, UsergroupAddOutlined} from "@ant-design/icons";
 import sideBarStyles from './layout.module.scss'
 import {useLocation, useNavigate} from "react-router-dom";
 
+import {Layout, Menu, theme} from "antd";
+
+const {Header, Sider, Content} = Layout;
 export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -18,13 +19,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             collapsed={collapsed}
             className={sideBarStyles.siderStyle}
             breakpoint="lg"
-            collapsedWidth="0"
-            onBreakpoint={(broken) => {
-                // console.log(broken);
-            }}
-            onCollapse={(collapsed, type) => {
-                // console.log(collapsed, type);
-            }}
+            collapsedWidth="70"
         >
             <div className={sideBarStyles.siderLogo}/>
             <Menu

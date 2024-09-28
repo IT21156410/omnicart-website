@@ -14,9 +14,7 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
     const handleLogout = () => {
         logout();
     };
-    const {
-        token: {colorBgContainer, borderRadiusLG},
-    } = theme.useToken();
+    const {token: {colorBgContainer, borderRadiusLG},} = theme.useToken();
     return (
         <Header style={{padding: 0, background: colorBgContainer}}>
             <Button

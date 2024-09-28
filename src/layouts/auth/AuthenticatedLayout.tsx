@@ -3,8 +3,10 @@ import {useAuth} from "../../hooks/useAuth.tsx";
 import {HeaderLayout} from "./Header.tsx";
 import {useState} from "react";
 import {Breadcrumb, Layout, theme} from "antd";
-import {Content} from "antd/es/layout/layout";
+
 import {Sidebar} from "./SideBar.tsx";
+
+const {Content} = Layout;
 
 export const ProtectedLayout = () => {
     const {user, is2FAVerified} = useAuth();
@@ -23,7 +25,7 @@ export const ProtectedLayout = () => {
     return (
         <Layout hasSider>
             <Sidebar collapsed={collapsed}/>
-            <Layout style={{marginInlineStart: 200}}>
+            <Layout>
                 <HeaderLayout collapsed={collapsed} setCollapsed={setCollapsed}/>
                 <Breadcrumb
                     className="ms-3"
