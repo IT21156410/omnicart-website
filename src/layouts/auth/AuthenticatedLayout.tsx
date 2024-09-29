@@ -35,7 +35,7 @@ export const ProtectedLayout = () => {
                 <Content style={{margin: '0 16px 0', overflow: 'initial'}}>
                     <div
                         style={{
-                            padding: '10px 16px 20px',
+                            padding: '10px 0px 20px',
                             minHeight: "74vh",
                             // background: colorBgContainer,
                             borderRadius: borderRadiusLG,

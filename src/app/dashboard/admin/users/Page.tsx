@@ -1,23 +1,55 @@
 import React, {useEffect, useState} from 'react';
-import {Accordion, Button, Col, Container, Dropdown, FormControl, InputGroup, Row, Table} from 'react-bootstrap';
+import {Accordion, Button, Dropdown, FormControl, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Typography} from 'antd';
+import {Card} from 'antd';
 import SaveModal from "./Patials/SaveModal.tsx";
+import {UserService} from "../../../../services/UserService.ts";
+import axios from "axios";
 
 const UserManagement = () => {
 
-    const [users, setUsers] = useState<User[]>([
-        {id: 1, name: 'John Doe', email: 'admin@example.com', role: 'admin'},
-        {id: 2, name: 'Jane Vendor', email: 'vendor@example.com', role: 'vendor'},
-        {id: 3, name: 'Sam CSR', email: 'csr@example.com', role: 'csr'}
-    ]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('admin');
+    const [axiosController, setAxiosController] = useState(new AbortController());
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const result = await UserService.getAllUsers(axiosController);
+                if (isMounted) {
+                    if (!result.success) {
+                        setError(result.message);
+                    }
+                    setUsers(result.data);
+                }
+            } catch (err: unknown) {
+                if (axios.isCancel(err)) {
+                    setAxiosController(new AbortController());
+                    console.log("Request canceled", err.message);
+                } else if (isMounted) setError("Something went wrong!");
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+
+        let isMounted = true;
+
+        fetchUsers();
+
+        return () => {
+            isMounted = false;
+            axiosController.abort("Component unmounted");
+        };
+    }, [axiosController]);
 
     // When editing a user, populate the form with the selected user's details
     useEffect(() => {
@@ -73,20 +105,11 @@ const UserManagement = () => {
         handleCloseModal();
     };
     return (
-        <div>
-            <Container fluid={true}>
-                <Row>
-                    <Col md={4}>
-                        <Typography.Title level={3}>User Management</Typography.Title>
-                    </Col>
-                    <Col md={{span: 4, offset: 4}} className="text-end">
-                        {/* Add User Button */}
-                        <Button variant="primary" onClick={handleAddUser} className="mb-3">
-                            Add User
-                        </Button>
-                    </Col>
-                </Row>
-            </Container>
+        <Card
+            title="User Management"
+            extra={<Button variant="primary" onClick={handleAddUser}>
+                Add User
+            </Button>}>
 
             {/* Search and Role Filter */}
             <Accordion defaultActiveKey="0" className="mb-4">
@@ -145,7 +168,7 @@ const UserManagement = () => {
                 showModal={showModal}
                 handleSaveUser={handleSaveUser}
                 state={{name, setName, email, setEmail, role, setRole,}}/>
-        </div>
+        </Card>
     );
 };
 

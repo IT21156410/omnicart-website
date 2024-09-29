@@ -2,7 +2,7 @@ import '../styles/App.css'
 import {LoginPage} from "./auth/Login.tsx";
 import {createBrowserRouter, createRoutesFromElements, defer, Route} from "react-router-dom";
 import Dashboard from "./dashboard/Page.tsx";
-import Home from "./Home.tsx";
+import Home from "./landing/Home.tsx";
 import {ProtectedLayout} from "../layouts/auth/AuthenticatedLayout.tsx";
 import {Verify2FA} from "./auth/Verify2FA.tsx";
 import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
