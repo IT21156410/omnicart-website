@@ -2,7 +2,7 @@ import {ApiInstance} from "../types/http-service/custom-axios";
 import ApiService from "./api/ApiService.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 import {CreateUserData, UpdateUserData, User} from "../types";
-import {ApiUtils} from "./ApiUtils.ts";
+import {ApiUtils} from "./api/ApiUtils.ts";
 import {AxiosRequestConfig} from "axios";
 
 export class UserService {
