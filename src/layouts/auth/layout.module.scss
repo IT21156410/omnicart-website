@@ -5,7 +5,11 @@
   margin: 2px 4px;
 }
 
-.siderStyle {
+.siderStyle:not(:global(.ant-layout-sider-collapsed)) {
+  max-width: 250px !important;
+  min-width: 250px !important;
+  width: 250px !important;
+
   //overflow: auto;
   //position: fixed;
   //inset-inline-start: 0;

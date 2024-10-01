@@ -4,6 +4,7 @@ import {
     CodepenOutlined,
     ProductOutlined,
     SettingOutlined,
+    UnorderedListOutlined,
     UsergroupAddOutlined
 } from "@ant-design/icons";
 import sideBarStyles from './layout.module.scss'
@@ -18,6 +19,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const openSubMenuKeys = [];
 
     switch (location.pathname) {
+        case "/vendor/products":
         case "/vendor/products/create":
             openSubMenuKeys.push('products')
             break;
@@ -60,6 +62,12 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                         icon: <ProductOutlined/>,
                         label: 'Product',
                         children: [
+                            {
+                                key: "/vendor/products",
+                                icon: <UnorderedListOutlined/>,
+                                label: 'Manage Products',
+                                onClick: () => navigate("/vendor/products")
+                            },
                             {
                                 key: "/vendor/products/create",
                                 icon: <CodepenOutlined/>,

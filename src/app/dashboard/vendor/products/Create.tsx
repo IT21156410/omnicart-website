@@ -141,7 +141,15 @@ const CreateProduct = () => {
                                 />
                             </Form.Group>
                         </Card>
-                        <Card title="Product Management" type="inner">
+                        <Card title="Product Management" type="inner" className="mb-3">
+                            <Alert
+                                className="mb-4"
+                                type="info"
+                                showIcon
+                                message="Tips"
+                                description="Choose the status that best reflects the availability of this product for customers."
+                            />
+
                             <Form.Group className="mb-3">
                                 <Form.Label className="me-4">Product Status</Form.Label>
                                 <Switch defaultChecked onChange={onChangeProductStatus}/>
@@ -161,6 +169,53 @@ const CreateProduct = () => {
                                 className="mb-3"
                             >
                                 <Form.Control type="text" placeholder="Enter Stock Keeping Unit"/>
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="price" label="Price (LKR)" className="mb-3">
+                                <Form.Control type="number" placeholder="Enter Price (LKR)"/>
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="discount" label="Discount (LKR)" className="mb-3">
+                                <Form.Control type="number" placeholder="Enter Discount (LKR)"/>
+                            </FloatingLabel>
+                        </Card>
+                        <Card type="inner" title="Shipping">
+                            <Alert
+                                className="mb-4"
+                                type="info"
+                                showIcon
+                                message="Tips"
+                                description="Pay close attention to the weight of the product so that there is no difference in data with the shipping courier. "
+                            />
+
+                            <FloatingLabel controlId="productWeight" label="Product Weight (g)" className="mb-3">
+                                <Form.Control type="number" placeholder="Enter Product Weight (In Grams(g))"/>
+                            </FloatingLabel>
+
+                            <Form.Group>
+                                <Form.Label className="me-4">Product Size</Form.Label>
+                            </Form.Group>
+
+                            <Row className="mb-3">
+                                <Col md>
+                                    <FloatingLabel controlId="width" label="Product width (cm)" className="mb-3">
+                                        <Form.Control type="number" placeholder="Enter Product width (in cm)"/>
+                                    </FloatingLabel>
+                                </Col>
+                                <Col md>
+                                    <FloatingLabel controlId="height" label="Product Height (cm)" className="mb-3">
+                                        <Form.Control type="number" placeholder="Enter Product Height (in cm)"/>
+                                    </FloatingLabel>
+                                </Col>
+                                <Col md>
+                                    <FloatingLabel controlId="length" label="Product Length (cm)" className="mb-3">
+                                        <Form.Control type="number" placeholder="Enter Product Length (in cm)"/>
+                                    </FloatingLabel>
+                                </Col>
+                            </Row>
+
+                            <FloatingLabel controlId="shippingFee" label="Shipping Fee (LKR)" className="mb-3">
+                                <Form.Control type="number" placeholder="Enter Shipping Fee (LKR)"/>
                             </FloatingLabel>
                         </Card>
                         <Divider dashed/>
