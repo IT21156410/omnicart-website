@@ -14,6 +14,8 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
         setEmail: (email: string) => void;
         role: string;
         setRole: (role: string) => void;
+        password: string;
+        setPassword: (role: string) => void;
     }
 }) => {
     return (
@@ -52,6 +54,15 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
                             <option value="vendor">Vendor</option>
                             <option value="csr">CSR</option>
                         </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="formUserPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder="Enter password"
+                            //defaultValue={selectedUser?.password || ''}
+                            value={state.password}
+                            onChange={(e) => state.setPassword(e.target.value)}/>
                     </Form.Group>
                 </Form>
             </Modal.Body>

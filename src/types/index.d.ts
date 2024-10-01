@@ -1,5 +1,5 @@
 export interface User {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: string;
@@ -8,20 +8,20 @@ export interface User {
 export interface CreateUserData {
     name: string;
     email: string;
-    phone: string;
-    address?: string;
+    //phone: string;
+    //address?: string;
     role: string;
     password: string;
-    passwordConfirmation: string;
-    photo?: File | null | undefined;
+    //photo?: File | null | undefined;
 }
 
 export interface UpdateUserData {
     name: string;
     email: string;
-    phone: string;
-    address?: string;
-    photo?: File | null;
+    role: string;
+    //phone: string;
+    //address?: string;
+    //photo?: File | null;
 }
 
 export interface Auth {

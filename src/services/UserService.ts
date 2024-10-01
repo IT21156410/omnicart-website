@@ -24,17 +24,17 @@ export class UserService {
         return res.data;
     }
 
-    public static async updateUser(updateUserData: UpdateUserData, userId: number): Promise<AppResponse<User>> {
+    public static async updateUser(updateUserData: UpdateUserData, userId: string): Promise<AppResponse<User>> {
 
         //const formData = convertToAPIFormData(updateUserData, true);
-        const config: AxiosRequestConfig = {params: {_method: 'PUT'}};
+        //const config: AxiosRequestConfig = {params: {_method: 'PUT'}};
         const ep = ApiUtils.publicUrl(`users/${userId}`);
-        const res = await this.api().post<UpdateUserData, AxiosAppResponse<User>>(ep, updateUserData, config);
+        const res = await this.api().put<UpdateUserData, AxiosAppResponse<User>>(ep, updateUserData);
         return res.data;
     }
 
 
-    public static async deleteUser(userId: number): Promise<AppResponse<User>> {
+    public static async deleteUser(userId: string): Promise<AppResponse<User>> {
 
         const ep = ApiUtils.publicUrl(`users/${userId}`);
         const res = await this.api().delete<UpdateUserData, AxiosAppResponse<User>>(ep);

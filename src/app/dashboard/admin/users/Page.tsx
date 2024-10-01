@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {Accordion, Button, Dropdown, FormControl, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card} from 'antd';
+import {Card, message, notification, Popconfirm} from 'antd';
 import SaveModal from "./Patials/SaveModal.tsx";
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
 
 const UserManagement = () => {
+
+    const [api, contextHolder] = notification.useNotification();
 
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -18,11 +20,14 @@ const UserManagement = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('admin');
+    const [password, setPassword] = useState("");
     const [axiosController, setAxiosController] = useState(new AbortController());
+
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
+                setLoading(true)
                 const result = await UserService.getAllUsers(axiosController);
                 if (isMounted) {
                     if (!result.success) {
@@ -61,6 +66,7 @@ const UserManagement = () => {
             // Reset the form when adding a new user
             setName('');
             setEmail('');
+            setPassword('');
             setRole('admin');
         }
     }, [selectedUser]);
@@ -75,8 +81,28 @@ const UserManagement = () => {
         setShowModal(true);
     };
 
-    const handleDeleteUser = (id: number) => {
-        setUsers(users.filter(user => user.id !== id));
+    const handleDeleteUser = async (id: string) => {
+        try {
+            setLoading(true)
+            const result = await UserService.deleteUser(id)
+            if (!result.success) {
+                setError(result.message);
+            } else {
+                setUsers(users.filter(user => user.id !== id));
+            }
+        } catch (err: any) {
+            api.open({
+                message: err.message,
+                //description: "Something went wrong!",
+                showProgress: true,
+                pauseOnHover: true,
+                type: "error",
+            });
+            setError("Something went wrong!");
+        } finally {
+            setLoading(false);
+        }
+
     };
 
     const handleCloseModal = () => {
@@ -84,33 +110,68 @@ const UserManagement = () => {
         setSelectedUser(null);
     };
 
-    // Add or update user logic
-    const handleSaveUser = () => {
-        if (selectedUser) {
-            // Edit existing user
+    const createUser = async () => {
+        if (selectedUser) return;
+        setLoading(true)
+        const result = await UserService.createUser({name, email, role, password})
+        if (!result.success) {
+            setError(result.message);
+        } else {
+            setUsers([...users, result.data]);
+        }
+    }
+
+    const updateUser = async () => {
+        if (!selectedUser) return;
+
+        setLoading(true)
+        const result = await UserService.updateUser({name, email, role}, selectedUser.id)
+        if (!result.success) {
+            setError(result.message);
+        } else {
             const updatedUsers = users.map(user =>
-                user.id === selectedUser.id ? {...user, name, email, role} : user
+                user.id === selectedUser.id ? {...user, ...result.data} : user
             );
             setUsers(updatedUsers);
-        } else {
-            // Add new user
-            const newUser: User = {
-                id: Math.random(), // Assign unique ID (you can use a better ID generation strategy)
-                name,
-                email,
-                role
-            };
-            setUsers([...users, newUser]);
+        }
+    }
+
+    // Add or update user logic
+    const handleSaveUser = async () => {
+        try {
+            if (selectedUser) {
+                await updateUser()
+            } else {
+                await createUser()
+            }
+        } catch (err: any) {
+            console.log(err)
+            if (axios.isCancel(err)) {
+                setAxiosController(new AbortController());
+                console.log("handleSaveUser Request canceled", err.message);
+            } else {
+                api.open({
+                    message: err.message,
+                    //description: "Something went wrong!",
+                    showProgress: true,
+                    pauseOnHover: true,
+                    type: "error",
+                });
+                setError("Something went wrong!");
+            }
+        } finally {
+            setLoading(false);
         }
         handleCloseModal();
     };
     return (
         <Card
+            loading={loading}
             title="User Management"
             extra={<Button variant="primary" onClick={handleAddUser}>
                 Add User
             </Button>}>
-
+            {contextHolder}
             {/* Search and Role Filter */}
             <Accordion defaultActiveKey="0" className="mb-4">
                 <Accordion.Item eventKey="0">
@@ -154,9 +215,19 @@ const UserManagement = () => {
                             <Button variant="warning" size="sm" onClick={() => handleEditUser(user)}>
                                 Edit
                             </Button>{' '}
-                            <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>
-                                Delete
-                            </Button>
+                            <Popconfirm
+                                title="Delete the user"
+                                description="Are you sure to delete this user?"
+                                onConfirm={() => handleDeleteUser(user.id)}
+                                okButtonProps={{loading: loading}}
+                                onCancel={() => message.warning("Canceled")}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button variant="danger" size="sm">
+                                    Delete
+                                </Button>
+                            </Popconfirm>
                         </td>
                     </tr>
                 ))}
@@ -167,7 +238,7 @@ const UserManagement = () => {
                 selectedUser={selectedUser}
                 showModal={showModal}
                 handleSaveUser={handleSaveUser}
-                state={{name, setName, email, setEmail, role, setRole,}}/>
+                state={{name, setName, email, setEmail, role, setRole, password, setPassword}}/>
         </Card>
     );
 };
