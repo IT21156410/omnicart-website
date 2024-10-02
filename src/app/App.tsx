@@ -1,16 +1,18 @@
 import '../styles/App.css'
-import {LoginPage} from "./auth/Login.tsx";
+import {LoginPage} from "./auth/LoginPage.tsx";
 import {createBrowserRouter, createRoutesFromElements, defer, Route} from "react-router-dom";
 import Dashboard from "./dashboard/Page.tsx";
 import Home from "./landing/Home.tsx";
 import {ProtectedLayout} from "../layouts/auth/AuthenticatedLayout.tsx";
-import {Verify2FA} from "./auth/Verify2FA.tsx";
+import {Verify2FAPage} from "./auth/Verify2FAPage.tsx";
 import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
 import {Root} from "../layouts/Root.tsx";
 import {User} from "../types";
 import UserManagement from "./dashboard/admin/users/Page.tsx";
 import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 import ManageProducts from "./dashboard/vendor/products/ManageProducts.tsx";
+import {RegisterPage} from "./auth/RegisterPage.tsx";
+import {ForgotPasswordPage} from "./auth/ForgotPasswordPage.tsx";
 
 const getUserData = () =>
     new Promise((resolve) =>
@@ -28,8 +30,10 @@ export const router = createBrowserRouter(
         >
             <Route path="/" element={<Home/>}/>
             <Route element={<GuestLayout/>}>
-                <Route path="/verify-2fa" element={<Verify2FA/>}/>
+                <Route path="/verify-2fa" element={<Verify2FAPage/>}/>
                 <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/register" element={<RegisterPage/>}/>
+                <Route path="/forgot-password" element={<ForgotPasswordPage/>}/>
             </Route>
 
             <Route element={<ProtectedLayout/>}>
