@@ -1,23 +1,42 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Card, message, notification} from 'antd';
 import {Col, Row} from "react-bootstrap";
 import Marquee from "react-fast-marquee";
 
 import ProductSaveForm from "./Partials/SaveForm.tsx";
 import {ProductService} from "../../../../services/ProductService.ts";
-import {CreateProductData} from "../../../../types/models/product.ts";
+import {Product, UpdateProductData} from "../../../../types/models/product.ts";
+import {useParams} from "react-router-dom";
 
-const CreateProduct = () => {
+const UpdateProduct = () => {
+    const {id} = useParams<{ id: string }>();
+    const [product, setProduct] = useState<Product | null>(null);
+
     const [api, contextHolder] = notification.useNotification();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Fetch product by ID when component mounts
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const response = await ProductService.getProductById(id!);  // Fetch the product using id
+                setProduct(response.data);  // Set the fetched product
+            } catch (err) {
+                setError('Failed to load product.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProduct();
+    }, [id]);
 
-    const handleCreateProduct = async (data: CreateProductData) => {
+    const handleUpdateProduct = async (data: UpdateProductData) => {
+
         try {
             setLoading(true)
-            const result = await ProductService.createProduct(data);
+            const result = await ProductService.updateProduct(data, id!);
             if (!result.success) {
                 setError(result.message);
             } else {
@@ -58,7 +77,13 @@ const CreateProduct = () => {
                             </Marquee>
                         }
                     />
-                    <ProductSaveForm<CreateProductData> onSubmit={handleCreateProduct}/>
+                    {product ? (
+                        <ProductSaveForm<UpdateProductData>
+                            isEditForm={true}
+                            product={product}
+                            onSubmit={handleUpdateProduct}
+                        />
+                    ) : null}
                 </Card>
             </Col>
         </Row>
@@ -67,4 +92,4 @@ const CreateProduct = () => {
     );
 };
 
-export default CreateProduct;
+export default UpdateProduct;

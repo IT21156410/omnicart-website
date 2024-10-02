@@ -10,7 +10,7 @@ export interface Product {
     name: string;
     category: string;
     photos: string[];
-    condition: 'new' | 'used';
+    condition: 'New' | 'Used';
     description: string;
     status: ProductStatus;
     stock: number;
@@ -28,7 +28,7 @@ export interface CreateProductData {
     name: string;
     category: string;
     photos: string[];
-    condition: 'new' | 'used';
+    condition: 'New' | 'Used';
     description: string;
     status: ProductStatus;
     stock: number;

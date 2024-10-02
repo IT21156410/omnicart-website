@@ -11,6 +11,7 @@ import {User} from "../types";
 import UserManagement from "./dashboard/admin/users/Page.tsx";
 import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 import ManageProducts from "./dashboard/vendor/products/ManageProducts.tsx";
+import UpdateProduct from "./dashboard/vendor/products/Edit.tsx";
 
 const getUserData = () =>
     new Promise((resolve) =>
@@ -42,6 +43,7 @@ export const router = createBrowserRouter(
                 <Route path="/vendor">
                     <Route path="products" element={<ManageProducts/>}/>
                     <Route path="products/create" element={<CreateProduct/>}/>
+                    <Route path="products/:id/edit" element={<UpdateProduct/>}/>
                 </Route>
             </Route>
         </Route>

@@ -1,9 +1,9 @@
 // https://www.freecodecamp.org/news/typescript-generics-with-functional-react-components/
 
 import React, {ChangeEventHandler, useRef, useState} from 'react';
-import {Alert, Card, Divider, GetProp, Image, Upload, UploadFile, UploadProps} from 'antd';
+import {Alert, Button as AntdButton, Card, Divider, GetProp, Image, Upload, UploadFile, UploadProps} from 'antd';
 import {Button, Col, FloatingLabel, Form, Row,} from 'react-bootstrap';
-import {EditOutlined, PlusOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
 import {CreateProductData, Product, UpdateProductData} from "../../../../../types/models/product.ts";
 
 import '../../../../../components/rich-text-editor/ckeditor.css'
@@ -11,6 +11,9 @@ import 'ckeditor5/ckeditor5.css';
 import {ckEditorConfig} from "../../../../../components/rich-text-editor/CkEditor.ts";
 import {ClassicEditor} from "ckeditor5";
 import {CKEditor} from "@ckeditor/ckeditor5-react";
+
+import fallback from "../../../../../assets/falback.png"
+import {useNavigate} from "react-router-dom";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -23,7 +26,7 @@ const getBase64 = (file: FileType): Promise<string> =>
     });
 
 type SaveFormPropsBase<T> = {
-    onSubmit: (data: T) => Promise<boolean>;
+    onSubmit: (data: T) => Promise<boolean | undefined>;
 };
 
 type SaveFormProps<T> = SaveFormPropsBase<T> & (
@@ -43,6 +46,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
         category: product?.category || "",
         condition: product?.condition || "",
         description: product?.description || "",
+        photos: product?.photos || [],
         stock: product?.stock || "",
         sku: product?.sku || "",
         price: product?.price || "",
@@ -53,6 +57,8 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
         length: product?.length || "",
         shippingFee: product?.shippingFee || ""
     } as T
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState<T>(initialData);
 
@@ -92,24 +98,55 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const photos: string[] = [];
-        fileList.map(async file => {
-            photos.push(await getBase64(file.originFileObj as FileType))
-        })
-        setFormData({
-            ...formData,
-            photos: photos
-        })
-        const result = await onSubmit(formData);
-        console.log(result)
-        if (result) {
-            setFormData(initialData);
-            setPreviewOpen(false)
-            setPreviewImage('')
+        console.log("clicked");
+
+        const photosList: string[] = formData.photos || [];
+        // Convert all files to base64
+        Promise.all(
+            fileList.map(file => getBase64(file.originFileObj as FileType))
+        ).then(async (newPhotosBase64) => {
+            const fileListBackup = fileList;
             setFileList([])
-        }
+
+            const updatedPhotosList = [...photosList, ...newPhotosBase64];
+
+            const updatedFormData = {
+                ...formData,
+                photos: updatedPhotosList,
+            };
+
+            setFormData(updatedFormData);
+
+            const result = await onSubmit(updatedFormData);
+            if (result) {
+                if (!isEditForm) {
+                    setFormData(initialData);
+                    navigate("/vendor/products/")
+                }
+                // if (isEditForm) location.reload();
+                if (isEditForm) window.scrollTo({top: 0, behavior: 'smooth'});
+                setPreviewOpen(false)
+                setPreviewImage('')
+                setFileList([])
+            } else {
+                // handle unsuccessfully save
+                setFormData({
+                    ...formData,
+                    photos: photosList,
+                });
+                setFileList(fileListBackup)
+            }
+        });
     };
 
+    const handleDeletePhoto = (index: number) => {
+        if (!isEditForm) return;
+
+        setFormData({
+            ...formData,
+            photos: formData.photos?.filter((_, i) => i !== index) // Remove the photo by index
+        });
+    };
     return (
         <Form onSubmit={handleSubmit}>
             {/* Product Name */}
@@ -170,6 +207,39 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         src={previewImage}
                     />
                 )}
+                {isEditForm &&
+                    <div className="mt-1">
+                        <Divider className="mt-4 mb-2"/>
+                        <Form.Group>
+                            <Form.Label className="me-4">Uploaded Images</Form.Label>
+                        </Form.Group>
+                        <div className="d-flex align-items-center">
+                            {(formData.photos) && formData.photos.map((photo, index) => (
+                                <div key={index} className="me-2 position-relative">
+                                    <Image
+                                        wrapperClassName="me-1"
+                                        className="object-fit-cover"
+                                        width={80}
+                                        height={80}
+                                        key={index}
+                                        src={photo}
+                                        fallback={fallback}
+                                    />
+                                    <AntdButton
+                                        className="position-absolute"
+                                        style={{top: 0, right: 0}}
+                                        danger
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<DeleteOutlined/>}
+                                        size="small"
+                                        onClick={() => handleDeletePhoto(index)} // Handle delete click
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                }
             </Card>
             <Card title="Product Details" type="inner" className="mb-3">
 
@@ -181,8 +251,8 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         onChange={handleInputChange}
                     >
                         <option value="">Choose condition</option>
-                        <option value="new">Brand New</option>
-                        <option value="used">Second Hand</option>
+                        <option value="New">Brand New</option>
+                        <option value="Used">Second Hand</option>
                     </Form.Select>
                 </FloatingLabel>
                 <Form.Group className="mb-3">
@@ -313,12 +383,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                 </FloatingLabel>
             </Card>
             <Divider dashed/>
-            {/* Submit Button */}
+            {/* Submit Button */
+            }
             <Button variant="primary" type="submit" className="px-5 py-2">
                 <EditOutlined/> {isEditForm ? 'Update Product' : 'Create Product'}
             </Button>
         </Form>
-    );
+    )
+        ;
 };
 
 export default ProductSaveForm;
