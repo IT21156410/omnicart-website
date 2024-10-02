@@ -8,10 +8,10 @@ export enum ProductStatus {
 export interface Product {
     id: string;
     name: string;
-    description: string;
     category: string;
     photos: string[];
     condition: 'new' | 'used';
+    description: string;
     status: ProductStatus;
     stock: number;
     sku: string;
@@ -28,7 +28,8 @@ export interface CreateProductData {
     name: string;
     category: string;
     photos: string[];
-    condition: 'new' | 'used' | 'refurbished';
+    condition: 'new' | 'used';
+    description: string;
     status: ProductStatus;
     stock: number;
     sku: string;
