@@ -4,6 +4,7 @@ import {Await, useLoaderData, useOutlet} from "react-router-dom";
 import {AuthProvider} from "../hooks/useAuth";
 import {Alert, Spin} from "antd";
 import {User} from "../types";
+import {NotificationProvider} from "../hooks/useNotification.tsx";
 
 export const Root = () => {
     const outlet = useOutlet();
@@ -16,7 +17,9 @@ export const Root = () => {
                 resolve={userPromise}
                 errorElement={<Alert type="error" message="Something went wrong!"/>}
                 children={(user) => (
-                    <AuthProvider>{outlet}</AuthProvider>
+                    <NotificationProvider>
+                        <AuthProvider>{outlet}</AuthProvider>
+                    </NotificationProvider>
                 )}
             />
         </Suspense>
