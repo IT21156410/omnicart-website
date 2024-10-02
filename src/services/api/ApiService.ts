@@ -1,6 +1,9 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
 import {ApiInstance} from "../../types/http-service/custom-axios";
 import {AppResponse} from "../../types/http-service/response";
+// import * as Bowser from 'bowser';
+import Bowser from 'bowser';
+import ServiceUtils from "./ServiceUtils.ts";
 
 class ApiService {
 
@@ -25,7 +28,7 @@ class ApiService {
 
     private setupInterceptors(): void {
         this.api.interceptors.request.use((config: any) => {
-            //let accessToken = null;
+            let accessToken: null | string;
             const defaultHeaders = {
                 'Content-Type': undefined,
                 'User-Agent': undefined,
@@ -36,16 +39,14 @@ class ApiService {
                 'X-Requested-With': 'XMLHttpRequest',
             };
 
-            // Browser environment
-            // accessToken = ServiceUtils.getAccessToken();
-            // const browser: Bowser.Parser.ParsedResult = Bowser.parse(window.navigator.userAgent);
+            accessToken = ServiceUtils.getAccessToken();
+            const browser: Bowser.Parser.ParsedResult = Bowser.parse(window.navigator.userAgent);
             config.headers = {
                 ...defaultHeaders,
                 ...(config.headers),
-                // source: Source.WEB.toString(),
-                // platform: `${browser.browser.name} ${browser.browser.version} ${browser.os.name} ${browser.platform.type}`
+                source: "web",
+                platform: `${browser.browser.name} ${browser.browser.version} ${browser.os.name} ${browser.platform.type}`
             };
-
 
             config = {
                 ...config,
@@ -53,9 +54,9 @@ class ApiService {
                 withXSRFToken: true
             }
 
-            // if (accessToken) {
-            //     config.headers.Authorization = `Bearer ${accessToken}`;
-            // }
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
             return config;
         });
 

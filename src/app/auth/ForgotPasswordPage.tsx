@@ -49,8 +49,8 @@ export const ForgotPasswordPage = () => {
                 if (error.response?.status >= 500) {
                     setErrors("An unexpected error occurred. Please try again.");
                 } else {
-                    setErrors(error.response.data.message);
-                    addNotification(error.response.data.message, "error", "Error");
+                    setErrors(error.response?.data?.message);
+                    addNotification(error.response?.data?.message, "error", "Error");
                 }
             }
         }
