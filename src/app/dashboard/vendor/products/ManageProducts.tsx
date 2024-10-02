@@ -109,6 +109,7 @@ const ManageProducts = () => {
                 )
         },
         {title: "Name", dataIndex: "name", key: "name",},
+        {title: "Status", dataIndex: "status", key: "status",},
         {title: "Category", dataIndex: "category", key: "category",},
         {title: "Condition", dataIndex: "condition", key: "condition",},
         {title: "Stock", dataIndex: "stock", key: "stock",},
@@ -120,9 +121,7 @@ const ManageProducts = () => {
         {
             title: "Size (CM)", key: "size", render: ((_, product) => (
                 <div key={`size-${product.id}`}>
-                    <div>Width: {product.width} cm</div>
-                    <div>Height: {product.height} cm</div>
-                    <div>Length {product.length} cm</div>
+                    {product.width} x {product.height} x {product.length} cm
                 </div>
             ))
         },
@@ -131,19 +130,18 @@ const ManageProducts = () => {
     const confirmDelete = (e: React.MouseEvent<HTMLElement, MouseEvent> | undefined, product: Product) => {
         e?.preventDefault()
         return new Promise((resolve, reject) => {
-            // axios.delete(route('super_admin.users.destroy', product.id))
-            //     .then(res => {
-            //         res.data.status && message.success("Successfully deleted");
-            //         resolve(null)
-            //     })
-            //     .catch(e => {
-            //         message.error(e.response.data.message || "Something went wrong");
-            //         reject(e.response.data.message || "Something went wrong");
-            //     })
-            //     .finally(() => {
-            //         router.reload({only: ['users']})
-            //     })
-            resolve(null)
+            ProductService.deleteProduct(product.id)
+                .then(result => {
+                    if (result.success) message.success(result.message);
+                    resolve(null)
+                })
+                .catch(e => {
+                    message.error(e.response.data.message || e.response.data.title || "Something went wrong");
+                    reject(e.response.data.message || e.response.data.title || "Something went wrong");
+                })
+                .finally(() => {
+                    setAxiosController(new AbortController()); // to refresh the data
+                })
         });
 
     };
