@@ -7,7 +7,6 @@ import {ProtectedLayout} from "../layouts/auth/AuthenticatedLayout.tsx";
 import {Verify2FAPage} from "./auth/Verify2FAPage.tsx";
 import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
 import {Root} from "../layouts/Root.tsx";
-import {User} from "../types";
 import UserManagement from "./dashboard/admin/users/Page.tsx";
 import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 import ManageProducts from "./dashboard/vendor/products/ManageProducts.tsx";
@@ -15,20 +14,13 @@ import UpdateProduct from "./dashboard/vendor/products/Edit.tsx";
 import {RegisterPage} from "./auth/RegisterPage.tsx";
 import {ForgotPasswordPage} from "./auth/ForgotPasswordPage.tsx";
 import {ResetPasswordPage} from "./auth/ResetPasswordPage.tsx";
-
-const getUserData = () =>
-    new Promise((resolve) =>
-        setTimeout(() => {
-            const user = window.localStorage.getItem("user");
-            resolve(user ? JSON.parse(user) as User : null);
-        }, 1000)
-    );
+import {AuthService} from "../services/AuthService.ts";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route
             element={<Root/>}
-            loader={() => defer({userPromise: getUserData()})}
+            loader={() => defer({userPromise: AuthService.getOwnUser()})}
         >
             <Route path="/" element={<Home/>}/>
             <Route element={<GuestLayout/>}>
@@ -41,13 +33,15 @@ export const router = createBrowserRouter(
 
             <Route element={<ProtectedLayout/>}>
                 <Route path="/admin">
+                    {/*// TODO: add separate or dynamic dashboard according to the role*/}
                     <Route path="dashboard" element={<Dashboard/>}/>
                     <Route path="users" element={<UserManagement/>}/>
                     <Route path="products" element={<ManageProducts isAdmin/>}/>
                     {/*<Route path="profile" element={<ProfilePage/>}/>*/}
-                    {/*<Route path="settings" element={<SettingsPage/>}/>*/}
                 </Route>
                 <Route path="/vendor">
+                    {/* // TODO: add separate or dynamic dashboard according to the role*/}
+                    <Route path="dashboard" element={<Dashboard/>}/>
                     <Route path="products" element={<ManageProducts/>}/>
                     <Route path="products/create" element={<CreateProduct/>}/>
                     <Route path="products/:id/edit" element={<UpdateProduct/>}/>
