@@ -1,5 +1,5 @@
 import React, {FormEventHandler, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
 import {useNotification} from "../../hooks/useNotification.tsx";
@@ -7,13 +7,19 @@ import {useNotification} from "../../hooks/useNotification.tsx";
 export const Verify2FAPage = () => {
 
     const navigate = useNavigate();
-    const {verify2FACode} = useAuth();
+    const {verify2FACode, send2FAVerifyCode, user} = useAuth();
     const {addNotification} = useNotification();
 
     const [code, setCode] = useState<string>("");
-    const [codeErrMsg, setCodeErrMsg] = useState<string>('');
+    const [codeErrMsg, setCodeErrMsg] = useState<string>("");
     const [errors, setErrors] = useState<string | null>(null);
     const [isDisable, setIsDisable] = useState<boolean>(false);
+    const [isResendDisabled, setIsResendDisabled] = useState<boolean>(false);
+    const [resendMessage, setResendMessage] = useState<string | null>(null);
+
+    if (!user) {
+        return <Navigate to="/login"/>;
+    }
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -27,15 +33,47 @@ export const Verify2FAPage = () => {
 
         try {
             setIsDisable(true);
-            const isValid = await verify2FACode(code);
-            if (isValid) {
-                addNotification("Two-step verification is successful", "success", "Success");
+            const res = await verify2FACode({code: code, email: user?.email || ""});
+            if (res.success) {
+                addNotification(res.message, "success", "Success");
                 navigate("/admin/dashboard");
             } else {
                 setErrors("Invalid code. Please try again.");
             }
         } catch (error) {
-            setErrors("An error occurred while verifying the code. Please try again.");
+            if (error.response?.status >= 500) {
+                setErrors("An unexpected error occurred. Please try again.");
+            } else {
+                setErrors(error.response?.data?.message);
+                addNotification(error.response?.data?.message, "error", "Error");
+            }
+        } finally {
+            setIsDisable(false);
+        }
+    };
+
+    const handleResendCode = async () => {
+        try {
+            setIsResendDisabled(true);
+            setResendMessage(null);
+            setIsDisable(true);
+            const res = await send2FAVerifyCode(user?.email || "");
+            if (res.success) {
+                setResendMessage("Code sent! Please check your email.");
+                addNotification(res.message, "success", "Info");
+            }
+
+            setTimeout(() => {
+                setIsResendDisabled(false);
+            }, 30000);
+
+        } catch (error) {
+            if (error.response?.status >= 500) {
+                setErrors("An unexpected error occurred. Please try again.");
+            } else {
+                setErrors(error.response?.data?.message);
+                addNotification(error.response?.data?.message, "error", "Error");
+            }
         } finally {
             setIsDisable(false);
         }
@@ -49,6 +87,7 @@ export const Verify2FAPage = () => {
                         <Card.Body>
                             <h2 className="text-center mb-4">Two Factor Authentication</h2>
                             {errors && <Alert variant="danger">{errors}</Alert>}
+                            {resendMessage && <Alert variant="info">{resendMessage}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group controlId="verificationCode" className="mb-3">
                                     <Form.Label>Verification Code</Form.Label>
@@ -57,6 +96,7 @@ export const Verify2FAPage = () => {
                                         value={code}
                                         onChange={(e) => setCode(e.target.value)}
                                         placeholder="Enter verification code"
+                                        maxLength={6}
                                     />
                                     <Form.Text className="text-danger">
                                         <small>{codeErrMsg}</small>
@@ -64,13 +104,22 @@ export const Verify2FAPage = () => {
                                 </Form.Group>
                                 <Button
                                     type="submit"
-                                    className={`w-100 ${isDisable && "pointer-events-none"}`}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
                                     variant="dark"
                                     disabled={isDisable}
                                 >
                                     Verify
                                 </Button>
                             </Form>
+                            <div className="mt-3 text-center">
+                                <Button
+                                    variant="link"
+                                    onClick={handleResendCode}
+                                    disabled={isResendDisabled}
+                                >
+                                    Resend Code
+                                </Button>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
