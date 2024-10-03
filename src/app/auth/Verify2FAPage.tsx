@@ -1,7 +1,7 @@
 import React, {FormEventHandler, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
+import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {useNotification} from "../../hooks/useNotification.tsx";
 
 export const Verify2FAPage = () => {
@@ -18,7 +18,7 @@ export const Verify2FAPage = () => {
     const [resendMessage, setResendMessage] = useState<string | null>(null);
 
     if (!user) {
-        return <Navigate to="/login"/>;
+        return <Navigate to="/login" replace/>;
     }
 
     const handleSubmit: FormEventHandler = async (e) => {

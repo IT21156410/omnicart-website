@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Image, Table, TableProps} from "antd";
+import {Button, Card, Image, message, Popconfirm, Table, TableProps, Tooltip} from "antd";
 import {Product} from "../../../../types/models/product.ts";
 import {ProductService} from "../../../../services/ProductService.ts";
 import axios from "axios";
 import fallback from "../../../../assets/falback.png"
+import {useNavigate} from "react-router-dom";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
 const ManageProducts = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -45,6 +48,50 @@ const ManageProducts = () => {
 
     const columns: TableProps<Product>['columns'] = [
         {
+            title: 'Action',
+            key: 'operation',
+            fixed: 'left',
+            width: 100,
+            render: (_, product) => {
+                return (
+                    <div className="d-flex justify-content-evenly">
+                        {/*// {product.can_update_users &&*/}
+                        <Tooltip title="Edit product">
+                            <Button
+                                type="link"
+                                className="bg-warning text-dark"
+                                // href={`/vendor/products/${product.id}/edit`}
+                                icon={<EditOutlined/>}
+                                size="small"
+                                onClick={() => navigate(`/vendor/products/${product.id}/edit`)}
+                            />
+                        </Tooltip>
+                        {/*// }*/}
+                        {/*// {product.can_delete_users &&*/}
+                        <Popconfirm
+                            title="Delete the product!"
+                            description="Are you sure to delete this product?"
+                            onConfirm={(e) => confirmDelete(e, product)}
+                            onCancel={() => message.error('Delete canceled!')}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Tooltip title="Delete The User">
+                                <Button
+                                    type="primary"
+                                    color="danger"
+                                    danger
+                                    icon={<DeleteOutlined/>}
+                                    size="small"
+                                />
+                            </Tooltip>
+                        </Popconfirm>
+                        {/*// }*/}
+                    </div>
+                )
+            },
+        },
+        {
             title: "Image", dataIndex: "photos", key: "photos", render: (_, product) =>
                 (
                     <>
@@ -62,6 +109,7 @@ const ManageProducts = () => {
                 )
         },
         {title: "Name", dataIndex: "name", key: "name",},
+        {title: "Status", dataIndex: "status", key: "status",},
         {title: "Category", dataIndex: "category", key: "category",},
         {title: "Condition", dataIndex: "condition", key: "condition",},
         {title: "Stock", dataIndex: "stock", key: "stock",},
@@ -73,14 +121,30 @@ const ManageProducts = () => {
         {
             title: "Size (CM)", key: "size", render: ((_, product) => (
                 <div key={`size-${product.id}`}>
-                    <div>Width: {product.width} cm</div>
-                    <div>Height: {product.height} cm</div>
-                    <div>Length {product.length} cm</div>
+                    {product.width} x {product.height} x {product.length} cm
                 </div>
             ))
         },
     ];
 
+    const confirmDelete = (e: React.MouseEvent<HTMLElement, MouseEvent> | undefined, product: Product) => {
+        e?.preventDefault()
+        return new Promise((resolve, reject) => {
+            ProductService.deleteProduct(product.id)
+                .then(result => {
+                    if (result.success) message.success(result.message);
+                    resolve(null)
+                })
+                .catch(e => {
+                    message.error(e.response.data.message || e.response.data.title || "Something went wrong");
+                    reject(e.response.data.message || e.response.data.title || "Something went wrong");
+                })
+                .finally(() => {
+                    setAxiosController(new AbortController()); // to refresh the data
+                })
+        });
+
+    };
     return (
         <Card loading={loading} title="Manage Products">
             <Table<Product> rowKey="id" columns={columns} dataSource={products}/>
