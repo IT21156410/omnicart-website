@@ -5,6 +5,7 @@ import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
 import {Link, Navigate, useNavigate} from "react-router-dom";
 import {ForgotPswData} from "../../types/http-service/auth";
+import {Image} from "antd";
 
 export const ForgotPasswordPage = () => {
 
@@ -89,6 +90,14 @@ export const ForgotPasswordPage = () => {
                 <Col md={6} lg={6}>
                     <Card>
                         <Card.Body>
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Image
+                                    src={"/omni-cart.webp"}
+                                    style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
+                                    preview={false}
+                                    onClick={() => navigate("/")}
+                                />
+                            </div>
                             {isSuccess ? (
                                 <>
                                     <h2 className="text-center mb-4">Successfully sent reset email!</h2>
@@ -156,7 +165,7 @@ export const ForgotPasswordPage = () => {
                     <Modal.Title>Enter Token</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Group controlId="token">
+                <Form.Group controlId="token">
                         <Form.Label>Token</Form.Label>
                         <Form.Control
                             as="textarea"

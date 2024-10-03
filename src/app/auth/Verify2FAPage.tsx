@@ -3,6 +3,7 @@ import {Navigate, useNavigate} from "react-router-dom";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {useNotification} from "../../hooks/useNotification.tsx";
+import {Image} from "antd";
 
 export const Verify2FAPage = () => {
 
@@ -85,6 +86,14 @@ export const Verify2FAPage = () => {
                 <Col md={6} lg={6}>
                     <Card>
                         <Card.Body>
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Image
+                                    src={"/omni-cart.webp"}
+                                    style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
+                                    preview={false}
+                                    onClick={() => navigate("/")}
+                                />
+                            </div>
                             <h2 className="text-center mb-4">Two Factor Authentication</h2>
                             {errors && <Alert variant="danger">{errors}</Alert>}
                             {resendMessage && <Alert variant="info">{resendMessage}</Alert>}

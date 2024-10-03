@@ -5,6 +5,7 @@ import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {ResetPswData} from "../../types/http-service/auth";
+import {Image} from "antd";
 
 export const ResetPasswordPage = () => {
 
@@ -102,6 +103,14 @@ export const ResetPasswordPage = () => {
                 <Col md={6} lg={6}>
                     <Card>
                         <Card.Body>
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Image
+                                    src={"/omni-cart.webp"}
+                                    style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
+                                    preview={false}
+                                    onClick={() => navigate("/")}
+                                />
+                            </div>
                             <h2 className="text-center mb-4">Reset Password</h2>
                             {errors && <Alert variant="danger">{errors}</Alert>}
                             <Form onSubmit={handleResetPassword}>

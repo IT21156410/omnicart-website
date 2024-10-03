@@ -5,8 +5,10 @@ import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
 import {UserSignUpData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
+import {Image} from "antd";
 
 export const RegisterPage = () => {
+
     const navigate = useNavigate();
     const {addNotification} = useNotification();
     const {register, user, is2FAVerified} = useAuth();
@@ -172,6 +174,14 @@ export const RegisterPage = () => {
                 <Col md={6} lg={6}>
                     <Card>
                         <Card.Body>
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Image
+                                    src={"/omni-cart.webp"}
+                                    style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
+                                    preview={false}
+                                    onClick={() => navigate("/")}
+                                />
+                            </div>
                             <h2 className="text-center mb-4">Register</h2>
                             {errors && <Alert variant="danger">{errors}</Alert>}
                             <Form onSubmit={handleRegister}>
