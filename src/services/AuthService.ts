@@ -3,6 +3,7 @@ import ApiService from "./api/ApiService.ts";
 import {ApiUtils} from "./api/ApiUtils.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 import {ForgotPswData, ResetPswData, TwoFAVerifyData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
+import {User} from "../types";
 
 export class AuthService {
 
@@ -33,9 +34,9 @@ export class AuthService {
     //     return res.data;
     // }
 
-    public static async getOwnUser(): Promise<AppResponse<any>> {
+    public static async getOwnUser(): Promise<AppResponse<User>> {
         const ep = ApiUtils.publicUrl("own-user");
-        const res = await AuthService.api().get(ep);
+        const res = await AuthService.api().get<Partial<User>, AxiosAppResponse<User>>(ep);
         return res.data;
     }
 

@@ -43,6 +43,7 @@ export const router = createBrowserRouter(
                 <Route path="/admin">
                     <Route path="dashboard" element={<Dashboard/>}/>
                     <Route path="users" element={<UserManagement/>}/>
+                    <Route path="products" element={<ManageProducts isAdmin/>}/>
                     {/*<Route path="profile" element={<ProfilePage/>}/>*/}
                     {/*<Route path="settings" element={<SettingsPage/>}/>*/}
                 </Route>

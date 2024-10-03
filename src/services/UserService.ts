@@ -10,7 +10,7 @@ export class UserService {
     }
 
     public static async getAllUsers(controller?: AbortController): Promise<AppResponse<User[]>> {
-        const ep = ApiUtils.publicUrl("users");
+        const ep = ApiUtils.adminUrl("users");
         const res = await this.api().get<Partial<User>, AxiosAppResponse<User[]>>(ep, {signal: controller?.signal});
         return res.data;
     }
@@ -18,7 +18,7 @@ export class UserService {
     public static async createUser(createUserData: CreateUserData): Promise<AppResponse<User>> {
 
         // const data = convertToAPIObj(createUserData);
-        const ep = ApiUtils.publicUrl(`users`);
+        const ep = ApiUtils.adminUrl(`users`);
         const res = await this.api().post<UpdateUserData, AxiosAppResponse<User>>(ep, createUserData);
         return res.data;
     }
@@ -27,7 +27,7 @@ export class UserService {
 
         //const formData = convertToAPIFormData(updateUserData, true);
         //const config: AxiosRequestConfig = {params: {_method: 'PUT'}};
-        const ep = ApiUtils.publicUrl(`users/${userId}`);
+        const ep = ApiUtils.adminUrl(`users/${userId}`);
         const res = await this.api().put<UpdateUserData, AxiosAppResponse<User>>(ep, updateUserData);
         return res.data;
     }
@@ -35,7 +35,7 @@ export class UserService {
 
     public static async deleteUser(userId: string): Promise<AppResponse<User>> {
 
-        const ep = ApiUtils.publicUrl(`users/${userId}`);
+        const ep = ApiUtils.adminUrl(`users/${userId}`);
         const res = await this.api().delete<UpdateUserData, AxiosAppResponse<User>>(ep);
         return res.data;
     }

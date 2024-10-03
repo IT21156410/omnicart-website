@@ -1,3 +1,5 @@
+import {User} from "../index";
+
 export enum ProductStatus {
     Active = 1,
     Inactive = 2,
@@ -8,6 +10,7 @@ export enum ProductStatus {
 export interface Product {
     id: string;
     userId: string;
+    vendorInfo?: User;
     name: string;
     category: string;
     photos: string[];

@@ -1,5 +1,5 @@
-import {createContext, PropsWithChildren, useCallback, useContext, useMemo} from "react";
-import {useNavigate} from "react-router-dom";
+import {createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useLocalStorage} from "./useLocalStorage";
 import {User} from "../types";
 import {AuthService} from "../services/AuthService.ts";
@@ -11,13 +11,13 @@ interface AuthContextType {
     token: string | null;
     is2FAVerified: boolean;
     resetPswEmail: string | null;
-    register: (data: UserSignUpData) => Promise<AppResponse<any>>;
-    login: (data: UserLoginData) => Promise<AppResponse<any>>;
+    register: (data: UserSignUpData) => Promise<AppResponse<any> | undefined>;
+    login: (data: UserLoginData) => Promise<AppResponse<any> | undefined>;
     logout: () => Promise<void>;
-    forgotPassword: (data: ForgotPswData) => Promise<AppResponse<any>>;
-    resetPassword: (data: ResetPswData) => Promise<AppResponse<any>>;
-    verify2FACode: (data: TwoFAVerifyData) => Promise<AppResponse<any>>;
-    send2FAVerifyCode: (data: string) => Promise<AppResponse<any>>;
+    forgotPassword: (data: ForgotPswData) => Promise<AppResponse<any> | undefined>;
+    resetPassword: (data: ResetPswData) => Promise<AppResponse<any> | undefined>;
+    verify2FACode: (data: TwoFAVerifyData) => Promise<AppResponse<any> | undefined>;
+    send2FAVerifyCode: (data: string) => Promise<AppResponse<any> | undefined>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +30,25 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
     const [token, setToken] = useLocalStorage<string | null>("x-token", null);
     const [is2FAVerified, setIs2FAVerified] = useLocalStorage<boolean>("is2FAVerified", false);
     const [resetPswEmail, setResetPswEmail] = useLocalStorage<string | null>("resetPswEmail", null);
+    const location = useLocation()
+
+    useEffect(() => {
+        getUser();
+    }, [location.pathname]);
+
+    const getUser = useCallback(async () => {
+        try {
+            const response = await AuthService.getOwnUser();
+            if (response.success && response.data) {
+                setUser(response.data);
+                return response;
+            } else {
+                await logout()
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, []);
 
     const register = useCallback(async (data: UserSignUpData) => {
         try {
@@ -40,9 +59,11 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                 return response;
             }
         } catch (error) {
-            throw error;
+            console.log(error);
         }
+
     }, []);
+
 
     const login = useCallback(async (data: UserLoginData) => {
         try {

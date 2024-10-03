@@ -7,7 +7,7 @@ import fallback from "../../../../assets/falback.png"
 import {useNavigate} from "react-router-dom";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
-const ManageProducts = () => {
+const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState<boolean>(true);
@@ -18,7 +18,7 @@ const ManageProducts = () => {
         const fetchProducts = async () => {
             try {
                 setLoading(true)
-                const result = await ProductService.getAllProducts(axiosController);
+                const result = await ProductService.getAllProducts(axiosController, isAdmin);
                 if (isMounted) {
                     if (!result.success) {
                         setError(result.message);
@@ -108,6 +108,13 @@ const ManageProducts = () => {
                     </>
                 )
         },
+        isAdmin ? {
+                title: "Vendor",
+                dataIndex: "vendorInfo.name",
+                key: "vendorInfo",
+                render: (_, product) => product.vendorInfo?.name ?? "-"
+            } :
+            {hidden: true},
         {title: "Name", dataIndex: "name", key: "name",},
         {title: "Status", dataIndex: "status", key: "status",},
         {title: "Category", dataIndex: "category", key: "category",},

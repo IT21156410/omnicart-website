@@ -11,8 +11,8 @@ export class ProductService {
     }
 
     // Get all products
-    public static async getAllProducts(controller?: AbortController): Promise<AppResponse<Product[]>> {
-        const ep = ApiUtils.publicUrl("products");
+    public static async getAllProducts(controller?: AbortController, isAdmin?: boolean): Promise<AppResponse<Product[]>> {
+        const ep = isAdmin ? ApiUtils.adminUrl('products') : ApiUtils.vendorUrl("products");
         const res = await this.api().get<Partial<Product>, AxiosAppResponse<Product[]>>(ep, {
             signal: controller?.signal,
         });
@@ -21,28 +21,28 @@ export class ProductService {
 
     // Get a product by ID
     public static async getProductById(productId: string): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl(`products/${productId}`);
+        const ep = ApiUtils.vendorUrl(`products/${productId}`);
         const res = await this.api().get<Partial<Product>, AxiosAppResponse<Product>>(ep);
         return res.data;
     }
 
     // Create a new product
     public static async createProduct(createProductData: CreateProductData): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl("products");
+        const ep = ApiUtils.vendorUrl("products");
         const res = await this.api().post<CreateProductData, AxiosAppResponse<Product>>(ep, createProductData);
         return res.data;
     }
 
     // Update a product
     public static async updateProduct(updateProductData: UpdateProductData, productId: string): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl(`products/${productId}`);
+        const ep = ApiUtils.vendorUrl(`products/${productId}`);
         const res = await this.api().put<UpdateProductData, AxiosAppResponse<Product>>(ep, updateProductData);
         return res.data;
     }
 
     // Delete a product
     public static async deleteProduct(productId: string): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl(`products/${productId}`);
+        const ep = ApiUtils.vendorUrl(`products/${productId}`);
         const res = await this.api().delete<UpdateProductData, AxiosAppResponse<Product>>(ep);
         return res.data;
     }
