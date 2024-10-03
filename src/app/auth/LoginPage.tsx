@@ -1,6 +1,6 @@
 import React, {FormEventHandler, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Navigate, Link} from "react-router-dom";
+import {Navigate, Link, useNavigate} from "react-router-dom";
 import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
 import {UserLoginData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
@@ -8,6 +8,7 @@ import {trimText} from "../../utils/util.ts";
 
 export const LoginPage = () => {
 
+    const navigate = useNavigate();
     const {addNotification} = useNotification();
     const {login, user, is2FAVerified} = useAuth();
 
@@ -26,6 +27,8 @@ export const LoginPage = () => {
 
     if (user && !is2FAVerified) {
         return <Navigate to="/verify-2fa"/>;
+    } else if (user && is2FAVerified) {
+        navigate(-1);
     }
 
     const validateFormData = (data: any): boolean[] => {
@@ -132,7 +135,7 @@ export const LoginPage = () => {
                                 </Form.Group>
                                 <Button
                                     type="submit"
-                                    className={`w-100 ${isDisable && "pointer-events-none"}`}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
                                     variant="dark"
                                     disabled={isDisable}
                                 >

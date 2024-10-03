@@ -1,13 +1,13 @@
 import React, {FormEventHandler, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Navigate, Link} from "react-router-dom";
+import {Navigate, Link, useNavigate} from "react-router-dom";
 import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
 import {UserSignUpData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
 
 export const RegisterPage = () => {
-
+    const navigate = useNavigate();
     const {addNotification} = useNotification();
     const {register, user, is2FAVerified} = useAuth();
 
@@ -16,6 +16,8 @@ export const RegisterPage = () => {
         email: "",
         password: "",
         passwordConfirmation: "",
+        role: "",
+        adminToken: "",
     };
 
     const [userSignUpData, setUserSignUpData] = useState<UserSignUpData>(initUserSignUpData);
@@ -24,15 +26,26 @@ export const RegisterPage = () => {
     const [emailErrMsg, setEmailErrMsg] = useState<string>("");
     const [passwordErrMsg, setPasswordErrMsg] = useState<string>("");
     const [passwordConfirmErrMsg, setPasswordConfirmErrMsg] = useState<string>("");
+    const [roleErrMsg, setRoleErrMsg] = useState<string>("");
+    const [adminTokenErrMsg, setAdminTokenErrMsg] = useState<string>("");
     const [errors, setErrors] = useState<any>(null);
     const [isDisable, setIsDisable] = useState<boolean>(false);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     if (user && !is2FAVerified) {
         return <Navigate to="/verify-2fa"/>;
+    } else if (user && is2FAVerified) {
+        navigate(-1);
     }
 
     const validateFormData = (data: any): boolean[] => {
         setHasValidationErr([]);
+        setNameErrMsg("");
+        setEmailErrMsg("");
+        setPasswordErrMsg("");
+        setPasswordConfirmErrMsg("");
+        setRoleErrMsg("");
+
         if (data.hasOwnProperty("name") && data.name === "") {
             const errorText = "Please enter your name.";
             setNameErrMsg(errorText);
@@ -68,6 +81,18 @@ export const RegisterPage = () => {
             const errorText = "Passwords do not match.";
             setPasswordConfirmErrMsg(errorText);
             setTimeout(() => setPasswordConfirmErrMsg(""), 3000);
+            hasValidationErr.push(true);
+        }
+
+        if (data.role === "") {
+            const errorText = "Please select a role.";
+            setRoleErrMsg(errorText);
+            setTimeout(() => setRoleErrMsg(""), 3000);
+            hasValidationErr.push(true);
+        } else if (data.role === "admin" && data.adminToken === "") {
+            const errorText = "Please enter your admin token.";
+            setAdminTokenErrMsg(errorText);
+            setTimeout(() => setAdminTokenErrMsg(""), 3000);
             hasValidationErr.push(true);
         }
 
@@ -123,6 +148,21 @@ export const RegisterPage = () => {
         setUserSignUpData((prevState) => ({
             ...prevState,
             passwordConfirmation: trimText(event.target.value, true) as string,
+        }));
+    };
+
+    const roleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+        setIsAdmin(event.target.value === 'admin');
+        setUserSignUpData((prevState) => ({
+            ...prevState,
+            role: event.target.value,
+        }));
+    };
+
+    const adminTokenChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setUserSignUpData((prevState) => ({
+            ...prevState,
+            adminToken: trimText(event.target.value, true) as string,
         }));
     };
 
@@ -187,21 +227,49 @@ export const RegisterPage = () => {
                                         <small>{passwordConfirmErrMsg}</small>
                                     </Form.Text>
                                 </Form.Group>
+                                <Form.Group id="role" className="mb-3">
+                                    <Form.Label>Role</Form.Label>
+                                    <Form.Select
+                                        name="role"
+                                        value={userSignUpData.role}
+                                        onChange={roleChange}
+                                        placeholder="Select your role"
+                                    >
+                                        <option value="">Select your role</option>
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                    </Form.Select>
+                                    <Form.Text className="text-danger">
+                                        <small>{roleErrMsg}</small>
+                                    </Form.Text>
+                                </Form.Group>
+                                {isAdmin && (
+                                    <Form.Group id="adminToken" className="mb-3">
+                                        <Form.Label>Admin Token</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="adminToken"
+                                            value={userSignUpData.adminToken}
+                                            onChange={adminTokenChange}
+                                            placeholder="Enter your admin token"
+                                        />
+                                        <Form.Text className="text-danger">
+                                            <small>{adminTokenErrMsg}</small>
+                                        </Form.Text>
+                                    </Form.Group>
+                                )}
                                 <Button
-                                    type="submit"
-                                    className={`w-100 ${isDisable && "pointer-events-none"}`}
-                                    variant="dark"
                                     disabled={isDisable}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
+                                    variant="dark"
+                                    type="submit"
                                 >
-                                    Register
+                                    Sign Up
                                 </Button>
                             </Form>
-
-                            <div className="mt-2 text-center">
-                                <span>Already have an account? </span>
-                                <Link to="/login" className="text-primary">
-                                    Login
-                                </Link>
+                            <div className="mt-3 text-center">
+                                Already have an account?
+                                <Link to="/login" className="mx-2 text-primary">Login</Link>
                             </div>
                         </Card.Body>
                     </Card>
