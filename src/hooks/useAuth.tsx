@@ -22,11 +22,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}: PropsWithChildren) => {
+export const AuthProvider = ({loggedUser, children}: PropsWithChildren<{ loggedUser: User | null }>) => {
 
     const navigate = useNavigate();
 
-    const [user, setUser] = useLocalStorage<User | null>("user", null);
+    const [user, setUser] = useLocalStorage<User | null>("user", loggedUser);
     const [token, setToken] = useLocalStorage<string | null>("x-token", null);
     const [is2FAVerified, setIs2FAVerified] = useLocalStorage<boolean>("is2FAVerified", false);
     const [resetPswEmail, setResetPswEmail] = useLocalStorage<string | null>("resetPswEmail", null);

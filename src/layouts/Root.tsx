@@ -5,12 +5,11 @@ import {AuthProvider} from "../hooks/useAuth";
 import {Alert, Spin} from "antd";
 import {User} from "../types";
 import {NotificationProvider} from "../hooks/useNotification.tsx";
-import {AppResponse} from "../types/http-service/response";
 
 export const Root = () => {
     const outlet = useOutlet();
 
-    const {userPromise} = useLoaderData() as { userPromise: Promise<AppResponse<User>> };
+    const {userPromise} = useLoaderData() as { userPromise: Promise<User | null> };
 
     return (
         <Suspense
@@ -18,10 +17,10 @@ export const Root = () => {
             <Await
                 resolve={userPromise}
                 errorElement={<Alert type="error" message="Something went wrong!"/>}
-                children={(user: AppResponse<User>) => {
+                children={(user: User | null) => {
                     return (
                         <NotificationProvider>
-                            <AuthProvider>{outlet}</AuthProvider>
+                            <AuthProvider loggedUser={user}>{outlet}</AuthProvider>
                         </NotificationProvider>
                     );
                 }}

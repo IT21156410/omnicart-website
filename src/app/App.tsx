@@ -16,11 +16,18 @@ import {ForgotPasswordPage} from "./auth/ForgotPasswordPage.tsx";
 import {ResetPasswordPage} from "./auth/ResetPasswordPage.tsx";
 import {AuthService} from "../services/AuthService.ts";
 
+const getUserData = () =>
+    new Promise((resolve) => {
+        AuthService.getOwnUser()
+            .then(response => resolve(response.data))
+            .catch(e => resolve(null))
+    });
+
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route
             element={<Root/>}
-            loader={() => defer({userPromise: AuthService.getOwnUser()})}
+            loader={() => defer({userPromise: getUserData()})}
         >
             <Route path="/" element={<Home/>}/>
             <Route element={<GuestLayout/>}>
