@@ -1,56 +1,118 @@
-import {createContext, PropsWithChildren, useContext, useMemo} from "react";
+import {createContext, PropsWithChildren, useCallback, useContext, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "./useLocalStorage";
 import {User} from "../types";
+import {AuthService} from "../services/AuthService.ts";
+import {AppResponse} from "../types/http-service/response";
+import {ForgotPswData, ResetPswData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
 
 interface AuthContextType {
     user: User | null;
-    login: (data: User) => Promise<void>;
+    token: string | null;
     is2FAVerified: boolean;
-    verify2FACode: (code: string) => Promise<boolean>;
-    logout: () => void;
+    register: (data: UserSignUpData) => Promise<AppResponse<any>>;
+    login: (data: UserLoginData) => Promise<AppResponse<any>>;
+    logout: () => Promise<void>;
+    forgotPassword: (data: ForgotPswData) => Promise<AppResponse<any>>;
+    resetPassword: (data: ResetPswData) => Promise<AppResponse<any>>;
+    verify2FACode: (code: string) => Promise<AppResponse<any>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}: PropsWithChildren) => {
-    const [user, setUser] = useLocalStorage<User | null>("user", null);
-    const [is2FAVerified, setIs2FAVerified] = useLocalStorage<boolean>("is2FAVerified", false);
+
     const navigate = useNavigate();
 
-    // call this function when you want to authenticate the user
-    const login = async (data: User) => {
-        setUser(data);
-        navigate("/verify-2fa");
-    };
+    const [user, setUser] = useLocalStorage<User | null>("user", null);
+    const [token, setToken] = useLocalStorage<string | null>("x-token", null);
+    const [is2FAVerified, setIs2FAVerified] = useLocalStorage<boolean>("is2FAVerified", false);
 
-    // call this function to sign out logged in user
-    const logout = () => {
+    const register = useCallback(async (data: UserSignUpData) => {
+        try {
+            const response = await AuthService.register(data);
+            if (response.success && response.message && response.data) {
+                setUser(response.data.user);
+                setToken(response.data.token);
+                return response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }, []);
+
+    const login = useCallback(async (data: UserLoginData) => {
+        try {
+            const response = await AuthService.login(data);
+            if (response.success && response.message && response.data) {
+                setUser(response.data.user);
+                setToken(response.data.token);
+                return response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }, []);
+
+    const logout = useCallback(async () => {
         setUser(null);
+        setToken(null);
         setIs2FAVerified(false);
         navigate("/", {replace: true});
-    };
+    }, [navigate]);
+
+    const forgotPassword = useCallback(async (data: ForgotPswData) => {
+        try {
+            const response = await AuthService.forgetPasswordSendEmail(data);
+            if (response.success) {
+                return response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }, []);
+
+    const resetPassword = useCallback(async (data: ResetPswData) => {
+        try {
+            const response = await AuthService.resetPasswordByEmail(data);
+            if (response.success) {
+                setUser(null);
+                setToken(null);
+                setIs2FAVerified(false);
+                return response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }, []);
 
     const verify2FACode = async (code: string) => {
-        //Mock verification logic
-        if (code === "0000") {  // TODO: implement
-            setIs2FAVerified(true);
-            navigate("/admin/dashboard"); // Navigate to a protected route after successful 2FA
-            return true;
+        try {
+            const response = await AuthService.verify2FAByMail(code);
+            if (response.success) {
+                setIs2FAVerified(true);
+                return response;
+            }
+        } catch (error) {
+            throw error;
         }
-        return false;
     };
 
     const value = useMemo(
         () => ({
             user,
-            is2FAVerified,
+            token,
+            register,
             login,
             logout,
+            forgotPassword,
+            resetPassword,
+            is2FAVerified,
             verify2FACode,
         }),
-        [user, is2FAVerified]
+        [user, token, is2FAVerified]
     );
+
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
