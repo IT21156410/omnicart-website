@@ -11,6 +11,8 @@ export interface UserSignUpData {
     email: string;
     password: string;
     passwordConfirmation: string;
+    role: string;
+    adminToken?: string;
 }
 
 export interface ForgotPswData {
@@ -20,9 +22,11 @@ export interface ForgotPswData {
 export interface ResetPswData {
     email: string;
     token: string;
-    otp: string;
-    password: string;
-    passwordConfirmation: string;
+    newPassword: string;
 }
 
+export interface TwoFAVerifyData {
+    email: string;
+    code: string;
+}
 

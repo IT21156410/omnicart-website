@@ -2,7 +2,7 @@ import {ApiInstance} from "../types/http-service/custom-axios";
 import ApiService from "./api/ApiService.ts";
 import {ApiUtils} from "./api/ApiUtils.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
-import {ForgotPswData, ResetPswData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
+import {ForgotPswData, ResetPswData, TwoFAVerifyData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
 
 export class AuthService {
 
@@ -51,9 +51,15 @@ export class AuthService {
         return res.data;
     }
 
-    public static async verify2FAByMail(code: string): Promise<AppResponse<any>> {
+    public static async verify2FAByMail(twoFAData: TwoFAVerifyData): Promise<AppResponse<any>> {
         const ep = ApiUtils.publicUrl("verify-2fa");
-        const res = await AuthService.api().post<string, AxiosAppResponse<any>>(ep, {code: code});
+        const res = await AuthService.api().post<TwoFAVerifyData, AxiosAppResponse<any>>(ep, twoFAData);
+        return res.data;
+    }
+
+    public static async send2FAVerifyCode(email: string): Promise<AppResponse<any>> {
+        const ep = ApiUtils.publicUrl("send-2fa-verify");
+        const res = await AuthService.api().post<string, AxiosAppResponse<any>>(ep, {email: email});
         return res.data;
     }
 

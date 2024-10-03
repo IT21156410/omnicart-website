@@ -13,6 +13,7 @@ import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 import ManageProducts from "./dashboard/vendor/products/ManageProducts.tsx";
 import {RegisterPage} from "./auth/RegisterPage.tsx";
 import {ForgotPasswordPage} from "./auth/ForgotPasswordPage.tsx";
+import {ResetPasswordPage} from "./auth/ResetPasswordPage.tsx";
 
 const getUserData = () =>
     new Promise((resolve) =>
@@ -34,6 +35,7 @@ export const router = createBrowserRouter(
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/forgot-password" element={<ForgotPasswordPage/>}/>
+                <Route path="/reset-password/:token" element={<ResetPasswordPage/>}/>
             </Route>
 
             <Route element={<ProtectedLayout/>}>
