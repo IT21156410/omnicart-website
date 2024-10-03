@@ -1,7 +1,15 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {useLocation} from "react-router-dom";
 
 export const useLocalStorage = <T, >(keyName: string, defaultValue: T): [T, (newValue: T) => void] => {
-    const [storedValue, setStoredValue] = useState<T>(() => {
+    const [storedValue, setStoredValue] = useState<T>(() => fetchStorageValue());
+    const location = useLocation()
+
+    useEffect(() => {
+        setValue(fetchStorageValue());
+    }, [location.pathname]);
+
+    function fetchStorageValue() {
         try {
             const value = window.localStorage.getItem(keyName);
             if (value) {
@@ -14,7 +22,7 @@ export const useLocalStorage = <T, >(keyName: string, defaultValue: T): [T, (new
             console.error(err);
             return defaultValue;
         }
-    });
+    }
 
     const setValue = (newValue: T): void => {
         try {

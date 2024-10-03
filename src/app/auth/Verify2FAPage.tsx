@@ -1,19 +1,23 @@
 import React, {FormEventHandler, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
+import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {useNotification} from "../../hooks/useNotification.tsx";
 
 export const Verify2FAPage = () => {
 
     const navigate = useNavigate();
-    const {verify2FACode} = useAuth();
+    const {user, verify2FACode} = useAuth();
     const {addNotification} = useNotification();
 
     const [code, setCode] = useState<string>("");
     const [codeErrMsg, setCodeErrMsg] = useState<string>('');
     const [errors, setErrors] = useState<string | null>(null);
     const [isDisable, setIsDisable] = useState<boolean>(false);
+
+    if (!user) {
+        return <Navigate to="/login" replace/>;
+    }
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
