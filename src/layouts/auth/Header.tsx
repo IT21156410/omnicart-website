@@ -11,12 +11,20 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
 }) => {
     const {user, logout} = useAuth();
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
     };
-    const {token: {colorBgContainer, borderRadiusLG},} = theme.useToken();
+
+    const {token: {colorBgContainer, borderRadiusLG}} = theme.useToken();
+
     return (
-        <Header style={{padding: 0, background: colorBgContainer}}>
+        <Header style={{
+            padding: 0,
+            background: colorBgContainer,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+        }}>
             <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
@@ -27,6 +35,16 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
                     height: 64,
                 }}
             />
+            <div style={{marginLeft: 'auto', marginRight: '16px'}}>
+                <Button
+                    type="default"
+                    onClick={handleLogout}
+                >
+                    <strong>
+                        <i className="bi bi-box-arrow-in-right text-dark" style={{fontSize: '24px'}}></i>
+                    </strong>
+                </Button>
+            </div>
         </Header>
     );
 };
