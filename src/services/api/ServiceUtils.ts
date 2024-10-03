@@ -5,7 +5,7 @@ class ServiceUtils {
     }
 
     public static getAccessToken(): string | null {
-        return localStorage.getItem("x-token");
+        return JSON.parse(localStorage.getItem("x-token") || "");
     }
 
     public static removeAccessToken(): void {
