@@ -4,18 +4,20 @@ import {useLocalStorage} from "./useLocalStorage";
 import {User} from "../types";
 import {AuthService} from "../services/AuthService.ts";
 import {AppResponse} from "../types/http-service/response";
-import {ForgotPswData, ResetPswData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
+import {ForgotPswData, ResetPswData, TwoFAVerifyData, UserLoginData, UserSignUpData} from "../types/http-service/auth";
 
 interface AuthContextType {
     user: User | null;
     token: string | null;
     is2FAVerified: boolean;
+    resetPswEmail: string | null;
     register: (data: UserSignUpData) => Promise<AppResponse<any>>;
     login: (data: UserLoginData) => Promise<AppResponse<any>>;
     logout: () => Promise<void>;
     forgotPassword: (data: ForgotPswData) => Promise<AppResponse<any>>;
     resetPassword: (data: ResetPswData) => Promise<AppResponse<any>>;
-    verify2FACode: (code: string) => Promise<AppResponse<any>>;
+    verify2FACode: (data: TwoFAVerifyData) => Promise<AppResponse<any>>;
+    send2FAVerifyCode: (data: string) => Promise<AppResponse<any>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
     const [user, setUser] = useLocalStorage<User | null>("user", null);
     const [token, setToken] = useLocalStorage<string | null>("x-token", null);
     const [is2FAVerified, setIs2FAVerified] = useLocalStorage<boolean>("is2FAVerified", false);
+    const [resetPswEmail, setResetPswEmail] = useLocalStorage<string | null>("resetPswEmail", null);
 
     const register = useCallback(async (data: UserSignUpData) => {
         try {
@@ -58,6 +61,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         setUser(null);
         setToken(null);
         setIs2FAVerified(false);
+        setResetPswEmail(null);
         navigate("/", {replace: true});
     }, [navigate]);
 
@@ -65,6 +69,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         try {
             const response = await AuthService.forgetPasswordSendEmail(data);
             if (response.success) {
+                setResetPswEmail(data.email);
                 return response;
             }
         } catch (error) {
@@ -79,6 +84,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
                 setUser(null);
                 setToken(null);
                 setIs2FAVerified(false);
+                setResetPswEmail(null);
                 return response;
             }
         } catch (error) {
@@ -86,11 +92,22 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         }
     }, []);
 
-    const verify2FACode = async (code: string) => {
+    const verify2FACode = async (data: TwoFAVerifyData) => {
         try {
-            const response = await AuthService.verify2FAByMail(code);
+            const response = await AuthService.verify2FAByMail(data);
             if (response.success) {
                 setIs2FAVerified(true);
+                return response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const send2FAVerifyCode = async (data: string) => {
+        try {
+            const response = await AuthService.send2FAVerifyCode(data);
+            if (response.success) {
                 return response;
             }
         } catch (error) {
@@ -107,10 +124,12 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
             logout,
             forgotPassword,
             resetPassword,
+            resetPswEmail,
             is2FAVerified,
             verify2FACode,
+            send2FAVerifyCode,
         }),
-        [user, token, is2FAVerified]
+        [user, token, resetPswEmail, is2FAVerified]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

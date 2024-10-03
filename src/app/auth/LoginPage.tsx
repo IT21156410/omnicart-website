@@ -1,13 +1,15 @@
 import React, {FormEventHandler, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Navigate, Link} from "react-router-dom";
+import {Navigate, Link, useNavigate} from "react-router-dom";
 import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
 import {UserLoginData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
+import {Image} from "antd";
 
 export const LoginPage = () => {
 
+    const navigate = useNavigate();
     const {addNotification} = useNotification();
     const {login, user, is2FAVerified} = useAuth();
 
@@ -26,6 +28,8 @@ export const LoginPage = () => {
 
     if (user && !is2FAVerified) {
         return <Navigate to="/verify-2fa"/>;
+    } else if (user && is2FAVerified) {
+        navigate(-1);
     }
 
     const validateFormData = (data: any): boolean[] => {
@@ -101,6 +105,14 @@ export const LoginPage = () => {
                 <Col md={6} lg={6}>
                     <Card>
                         <Card.Body>
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Image
+                                    src={"/omni-cart.webp"}
+                                    style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
+                                    preview={false}
+                                    onClick={() => navigate("/")}
+                                />
+                            </div>
                             <h2 className="text-center mb-4">Login</h2>
                             {errors && <Alert variant="danger">{errors}</Alert>}
                             <Form onSubmit={handleLogin}>
@@ -132,7 +144,7 @@ export const LoginPage = () => {
                                 </Form.Group>
                                 <Button
                                     type="submit"
-                                    className={`w-100 ${isDisable && "pointer-events-none"}`}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
                                     variant="dark"
                                     disabled={isDisable}
                                 >
