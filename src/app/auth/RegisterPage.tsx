@@ -1,7 +1,7 @@
 import React, {FormEventHandler, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Navigate, Link, useNavigate} from "react-router-dom";
-import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
+import {Link, Navigate, useNavigate} from "react-router-dom";
+import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {UserSignUpData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
@@ -40,7 +40,7 @@ export const RegisterPage = () => {
         navigate(-1);
     }
 
-    const validateFormData = (data: any): boolean[] => {
+    const validateFormData = (data: UserSignUpData): boolean[] => {
         setHasValidationErr([]);
         setNameErrMsg("");
         setEmailErrMsg("");
@@ -48,14 +48,14 @@ export const RegisterPage = () => {
         setPasswordConfirmErrMsg("");
         setRoleErrMsg("");
 
-        if (data.hasOwnProperty("name") && data.name === "") {
+        if (Object.prototype.hasOwnProperty.call(data, "name") && data.name === "") {
             const errorText = "Please enter your name.";
             setNameErrMsg(errorText);
             setTimeout(() => setNameErrMsg(""), 3000);
             hasValidationErr.push(true);
         }
 
-        if (data.hasOwnProperty("email") && data.email === "") {
+        if (Object.prototype.hasOwnProperty.call(data, "email") && data.email === "") {
             const errorText = "Please enter the email.";
             setEmailErrMsg(errorText);
             setTimeout(() => setEmailErrMsg(""), 3000);
@@ -67,7 +67,7 @@ export const RegisterPage = () => {
             hasValidationErr.push(true);
         }
 
-        if (data.hasOwnProperty("password") && data.password === "") {
+        if (Object.prototype.hasOwnProperty.call(data, "password") && data.password === "") {
             const errorText = "Please enter the password.";
             setPasswordErrMsg(errorText);
             setTimeout(() => setPasswordErrMsg(""), 3000);
@@ -109,12 +109,12 @@ export const RegisterPage = () => {
             if (!validateFormData(userSignUpData).includes(true)) {
                 setIsDisable(true);
                 const res = await register(userSignUpData);
-                addNotification(res.message, "success", "Success");
+                if (res) addNotification(res.message, "success", "Success");
             } else {
                 setIsDisable(false);
                 console.error("SIGN UP FAILED: Please enter valid data.");
             }
-        } catch (error) {
+        } catch (error: any) {
             setIsDisable(false);
             if (error.response?.status >= 500) {
                 setErrors("An unexpected error occurred. Please try again.");
@@ -243,7 +243,6 @@ export const RegisterPage = () => {
                                         name="role"
                                         value={userSignUpData.role}
                                         onChange={roleChange}
-                                        placeholder="Select your role"
                                     >
                                         <option value="">Select your role</option>
                                         <option value="user">User</option>

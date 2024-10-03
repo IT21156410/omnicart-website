@@ -1,7 +1,7 @@
 import React, {FormEventHandler, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {Navigate, Link, useNavigate} from "react-router-dom";
-import {Container, Row, Col, Form, Button, Card, Alert} from "react-bootstrap";
+import {Link, Navigate, useNavigate} from "react-router-dom";
+import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {UserLoginData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
@@ -32,9 +32,9 @@ export const LoginPage = () => {
         navigate(-1);
     }
 
-    const validateFormData = (data: any): boolean[] => {
+    const validateFormData = (data: UserLoginData): boolean[] => {
         setHasValidationErr([]);
-        if (data.hasOwnProperty('email') && data.email === "") {
+        if (Object.prototype.hasOwnProperty.call(data, 'email') && data.email === "") {
             const errorText = 'Please enter the email.';
             setEmailErrMsg(errorText);
             setTimeout(() => setEmailErrMsg(''), 3000);
@@ -46,7 +46,7 @@ export const LoginPage = () => {
             setTimeout(() => setEmailErrMsg(''), 3000);
             hasValidationErr.push(true);
         }
-        if (data.hasOwnProperty('password') && data.password === "") {
+        if (Object.prototype.hasOwnProperty.call(data, 'password') && data.password === "") {
             const errorText = 'Please enter the password.';
             setPasswordErrMsg(errorText);
             setTimeout(() => setPasswordErrMsg(''), 3000);
@@ -69,12 +69,12 @@ export const LoginPage = () => {
             if (!validateFormData(userLoginData).includes(true)) {
                 setIsDisable(true);
                 const res = await login(userLoginData);
-                addNotification(res.message, "success", "Success");
+                if (res) addNotification(res.message, "success", "Success");
             } else {
                 setIsDisable(false);
                 console.error('SIGN IN FAILED: Please enter valid data.');
             }
-        } catch (error) {
+        } catch (error: any) {
             setIsDisable(false);
             if (error.response?.status >= 500) {
                 setErrors("An unexpected error occurred. Please try again.");

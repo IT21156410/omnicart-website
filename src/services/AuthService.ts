@@ -16,15 +16,17 @@ export class AuthService {
         await AuthService.api().get(ep);
     };
 
-    public static async register(userData: UserSignUpData): Promise<AppResponse<any>> {
+    public static async register(userData: UserSignUpData): Promise<AppResponse<{ user: User, token: string }>> {
         const ep = ApiUtils.publicUrl("register");
-        const res = await AuthService.api().post<UserSignUpData, AxiosAppResponse<any>>(ep, userData);
+        const res = await AuthService.api().post<UserSignUpData, AxiosAppResponse<{ user: User, token: string }>>(ep, userData);
         return res.data;
     }
 
-    public static async login(userData: UserLoginData): Promise<AppResponse<any>> {
+    public static async login(userData: UserLoginData): Promise<AppResponse<{ user: User, token: string }>> {
         const ep = ApiUtils.publicUrl("login");
-        const res = await AuthService.api().post<UserLoginData, AxiosAppResponse<any>>(ep, userData);
+        const res = await AuthService.api()
+            .post<UserLoginData, AxiosAppResponse<{ user: User, token: string }>>(ep, userData);
+
         return res.data;
     }
 

@@ -11,8 +11,8 @@ interface AuthContextType {
     token: string | null;
     is2FAVerified: boolean;
     resetPswEmail: string | null;
-    register: (data: UserSignUpData) => Promise<AppResponse<any> | undefined>;
-    login: (data: UserLoginData) => Promise<AppResponse<any> | undefined>;
+    register: (data: UserSignUpData) => Promise<AppResponse<{ user: User, token: string }> | undefined>;
+    login: (data: UserLoginData) => Promise<AppResponse<{ user: User, token: string }> | undefined>;
     logout: () => Promise<void>;
     forgotPassword: (data: ForgotPswData) => Promise<AppResponse<any> | undefined>;
     resetPassword: (data: ResetPswData) => Promise<AppResponse<any> | undefined>;
