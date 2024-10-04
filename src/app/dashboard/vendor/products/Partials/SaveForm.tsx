@@ -31,7 +31,7 @@ type SaveFormPropsBase<T> = {
 
 type SaveFormProps<T> = SaveFormPropsBase<T> & (
     | { isEditForm: true; product: Product } // Editing form with a preloaded product
-    | { isEditForm?: false; product?: never } // Creation form without product
+    | { isEditForm?: false; product?: undefined } // Creation form without product
     );
 
 const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({

@@ -2,7 +2,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: Role;
 }
 
 export interface CreateUserData {
@@ -10,7 +10,7 @@ export interface CreateUserData {
     email: string;
     //phone: string;
     //address?: string;
-    role: string;
+    role: Role;
     password: string;
     //photo?: File | null | undefined;
 }
@@ -18,10 +18,17 @@ export interface CreateUserData {
 export interface UpdateUserData {
     name: string;
     email: string;
-    role: string;
+    role: Role;
     //phone: string;
     //address?: string;
     //photo?: File | null;
+}
+
+export enum Role {
+    admin = 'admin',
+    vendor = 'vendor',
+    csr = 'csr',
+    customer = 'customer',
 }
 
 export interface Auth {

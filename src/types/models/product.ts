@@ -1,10 +1,11 @@
 import {User} from "../index";
+import {Category} from "./category.ts";
 
 export enum ProductStatus {
-    Active = 1,
-    Inactive = 2,
-    OutOfStock = 3,
-    Discontinued = 4
+    Pending = "Pending",
+    Active = "Active",
+    Inactive = "Inactive",
+    Rejected = "Rejected"
 }
 
 export interface Product {
@@ -12,7 +13,8 @@ export interface Product {
     userId: string;
     vendorInfo?: User;
     name: string;
-    category: string;
+    categoryId?: string;
+    category?: Category;
     photos: string[];
     condition: 'New' | 'Used';
     description: string;
@@ -30,7 +32,8 @@ export interface Product {
 
 export interface CreateProductData {
     name: string;
-    category: string;
+    categoryId?: string;
+    category?: Category;
     photos: string[];
     condition: 'New' | 'Used';
     description: string;
