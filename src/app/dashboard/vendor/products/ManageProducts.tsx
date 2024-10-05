@@ -1,16 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Image, message, Popconfirm, Table, TableProps, Tooltip} from "antd";
-import {Product} from "../../../../types/models/product.ts";
+import {Button, Card, Image, message, Popconfirm, Select, Table, TableProps, Tag, Tooltip} from "antd";
+import {Product, ProductStatus, statusColors} from "../../../../types/models/product.ts";
 import {ProductService} from "../../../../services/ProductService.ts";
 import axios from "axios";
 import fallback from "../../../../assets/falback.png"
 import {useNavigate} from "react-router-dom";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {useAuth} from "../../../../hooks/useAuth.tsx";
+import {Role} from "../../../../enums/auth.ts";
+
 
 const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
+    const {user} = useAuth();
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState<boolean>(true);
+    const [statusChanging, setStatusChanging] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null);
     const [axiosController, setAxiosController] = useState(new AbortController());
 
@@ -51,42 +56,59 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             title: 'Action',
             key: 'operation',
             fixed: 'left',
-            width: 100,
             render: (_, product) => {
                 return (
                     <div className="d-flex justify-content-evenly">
-                        {/*// {product.can_update_users &&*/}
-                        <Tooltip title="Edit product">
-                            <Button
-                                type="link"
-                                className="bg-warning text-dark"
-                                // href={`/vendor/products/${product.id}/edit`}
-                                icon={<EditOutlined/>}
-                                size="small"
-                                onClick={() => navigate(`/vendor/products/${product.id}/edit`)}
-                            />
-                        </Tooltip>
-                        {/*// }*/}
-                        {/*// {product.can_delete_users &&*/}
-                        <Popconfirm
-                            title="Delete the product!"
-                            description="Are you sure to delete this product?"
-                            onConfirm={(e) => confirmDelete(e, product)}
-                            onCancel={() => message.error('Delete canceled!')}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <Tooltip title="Delete The User">
-                                <Button
-                                    type="primary"
-                                    color="danger"
-                                    danger
-                                    icon={<DeleteOutlined/>}
-                                    size="small"
+                        {user!.role === Role.vendor && (
+                            <>
+                                <Tooltip title="Edit product">
+                                    <Button
+                                        type="link"
+                                        className="bg-warning text-dark"
+                                        // href={`/vendor/products/${product.id}/edit`}
+                                        icon={<EditOutlined/>}
+                                        size="small"
+                                        onClick={() => navigate(`/vendor/products/${product.id}/edit`)}
+                                    />
+                                </Tooltip>
+                                <Popconfirm
+                                    title="Delete the product!"
+                                    description="Are you sure to delete this product?"
+                                    onConfirm={(e) => confirmDelete(e, product)}
+                                    onCancel={() => message.error('Delete canceled!')}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Tooltip title="Delete The User">
+                                        <Button
+                                            type="primary"
+                                            color="danger"
+                                            danger
+                                            icon={<DeleteOutlined/>}
+                                            size="small"
+                                        />
+                                    </Tooltip>
+                                </Popconfirm>
+                            </>
+                        )}
+                        {user!.role === Role.admin && (
+                            <>
+                                <Select<ProductStatus>
+                                    defaultValue={product.status}
+                                    style={{width: 120}}
+                                    placeholder="Select product status"
+                                    onChange={(status) => changeStatus(status, product)}
+                                    disabled={statusChanging}
+                                    options={[
+                                        {value: ProductStatus.Pending, label: <span>{ProductStatus.Pending}</span>},
+                                        {value: ProductStatus.Active, label: <span>{ProductStatus.Active}</span>},
+                                        {value: ProductStatus.Inactive, label: <span>{ProductStatus.Inactive}</span>},
+                                        {value: ProductStatus.Rejected, label: <span>{ProductStatus.Rejected}</span>,}, /*disabled:true*/
+                                    ]}
                                 />
-                            </Tooltip>
-                        </Popconfirm>
-                        {/*// }*/}
+                            </>
+                        )}
+
                     </div>
                 )
             },
@@ -116,7 +138,12 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             } :
             {hidden: true},
         {title: "Name", dataIndex: "name", key: "name",},
-        {title: "Status", dataIndex: "status", key: "status",},
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (_, product) => (<Tag color={statusColors[product.status]}>{product.status}</Tag>)
+        },
         {
             title: "Category",
             dataIndex: "category.name",
@@ -138,6 +165,25 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             ))
         },
     ];
+
+    const changeStatus = async (status: ProductStatus, product: Product) => {
+        setStatusChanging(true)
+        try {
+            const result = await ProductService.updateProductStatus(product.id, status);
+            if (result.success) {
+                message.success(result.message);
+                setProducts(prevProducts =>
+                    prevProducts.map(p =>
+                        p.id === product.id ? {...p, status: status} : p
+                    )
+                );
+            }
+        } catch (e) {
+            message.error('Error updating product status');
+        } finally {
+            setStatusChanging(false);
+        }
+    }
 
     const confirmDelete = (e: React.MouseEvent<HTMLElement, MouseEvent> | undefined, product: Product) => {
         e?.preventDefault()

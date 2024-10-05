@@ -1,7 +1,7 @@
 import {ApiInstance} from "../types/http-service/custom-axios";
 import ApiService from "./api/ApiService.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
-import {CreateProductData, Product, UpdateProductData} from "../types/models/product";
+import {CreateProductData, Product, ProductStatus, UpdateProductData} from "../types/models/product";
 import {ApiUtils} from "./api/ApiUtils.ts";
 
 export class ProductService {
@@ -48,16 +48,16 @@ export class ProductService {
     }
 
     // Update product status (Activate/Deactivate)
-    public static async updateProductStatus(productId: string, status: number): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl(`products/status/${productId}`);
-        const res = await this.api().put<{ status: number }, AxiosAppResponse<Product>>(ep, {status});
+    public static async updateProductStatus(productId: string, status: ProductStatus): Promise<AppResponse<Product>> {
+        const ep = ApiUtils.adminUrl(`products/${productId}/status`);
+        const res = await this.api().patch<{ status: number }, AxiosAppResponse<Product>>(ep, {status});
         return res.data;
     }
 
     // Update product stock
     public static async updateProductStock(productId: string, newStock: number): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.publicUrl(`products/stock/${productId}`);
-        const res = await this.api().put<{ stock: number }, AxiosAppResponse<Product>>(ep, {stock: newStock});
+        const ep = ApiUtils.adminUrl(`products/${productId}/stock`);
+        const res = await this.api().patch<{ stock: number }, AxiosAppResponse<Product>>(ep, {stock: newStock});
         return res.data;
     }
 

@@ -1,3 +1,5 @@
+import {Role} from "../enums/auth.ts";
+
 export interface User {
     id: string;
     name: string;
@@ -22,13 +24,6 @@ export interface UpdateUserData {
     //phone: string;
     //address?: string;
     //photo?: File | null;
-}
-
-export enum Role {
-    admin = 'admin',
-    vendor = 'vendor',
-    csr = 'csr',
-    customer = 'customer',
 }
 
 export interface Auth {

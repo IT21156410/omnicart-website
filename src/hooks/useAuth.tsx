@@ -45,9 +45,9 @@ export const AuthProvider = ({loggedUser, children}: PropsWithChildren<{ loggedU
             } else {
                 await logout()
             }
-        } catch (error) {
+        } catch (error: any) {
             const pathsToCheck = ['admin', 'customer', 'vendor', 'csr'];
-            if (pathsToCheck.some(path => location.pathname.includes(path)) && error.status === 401) {
+            if (pathsToCheck.some(path => window.location.pathname.includes(path)) && error.status === 401) {
                 await logout()
                 console.info("logout because pathname in auth routes")
             }

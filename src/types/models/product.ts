@@ -8,6 +8,13 @@ export enum ProductStatus {
     Rejected = "Rejected"
 }
 
+export const statusColors: { [key in ProductStatus]: string } = {
+    [ProductStatus.Pending]: 'orange',
+    [ProductStatus.Active]: 'green',
+    [ProductStatus.Inactive]: 'red',
+    [ProductStatus.Rejected]: 'volcano',
+};
+
 export interface Product {
     id: string;
     userId: string;
