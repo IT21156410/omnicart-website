@@ -1,6 +1,6 @@
 // https://www.freecodecamp.org/news/typescript-generics-with-functional-react-components/
 
-import React, {ChangeEventHandler, useRef, useState} from 'react';
+import React, {ChangeEventHandler, useEffect, useRef, useState} from 'react';
 import {Alert, Button as AntdButton, Card, Divider, GetProp, Image, Upload, UploadFile, UploadProps} from 'antd';
 import {Button, Col, FloatingLabel, Form, Row,} from 'react-bootstrap';
 import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
@@ -14,6 +14,8 @@ import {CKEditor} from "@ckeditor/ckeditor5-react";
 
 import fallback from "../../../../../assets/falback.png"
 import {useNavigate} from "react-router-dom";
+import {Category} from "../../../../../types/models/category.ts";
+import {CategoryService} from "../../../../../services/CategoryService.ts";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -43,7 +45,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
     const initialData = {
         ...(product ? product : {}),
         name: product?.name || "",
-        category: product?.category || "",
+        categoryId: product?.categoryId || "",
         condition: product?.condition || "",
         description: product?.description || "",
         photos: product?.photos || [],
@@ -65,8 +67,36 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([])
+    const [categories, setCategories] = useState<Category[]>([])
+    const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true)
 
     const editorRef = useRef(null);
+
+    useEffect(() => {
+        let isMounted = true;
+        const getCategories = async () => {
+            try {
+                setCategoriesLoading(true);
+                // setCategories([]);
+                const result = await CategoryService.all();
+                if (result.success) {
+                    setCategories(result.data);
+                }
+            } catch (error) {
+                setCategories([]);
+            } finally {
+                setCategoriesLoading(false);
+            }
+        }
+
+        if (isMounted) {
+            getCategories();
+        }
+
+        return () => {
+            isMounted = false;
+        }
+    }, []);
 
     const handlePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
@@ -160,16 +190,18 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
             </FloatingLabel>
 
             {/* Product Category */}
-            <FloatingLabel controlId="category" label="Product Category" className="mb-3">
+            <FloatingLabel controlId="categoryId" label="Product Category" className="mb-3">
                 <Form.Select
                     aria-label="Category"
-                    value={formData.category}
+                    value={formData.categoryId}
                     onChange={handleInputChange}
                 >
                     <option>Category</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Fashion">Fashion</option>
-                    <option value="Home">Home</option>
+                    {categoriesLoading && <option>Loading...</option>}
+                    {
+                        !categoriesLoading && categories.map((category) => (
+                            <option key={category.id} value={category.id}>{category.name}</option>))
+                    }
                 </Form.Select>
             </FloatingLabel>
 

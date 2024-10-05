@@ -117,7 +117,12 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             {hidden: true},
         {title: "Name", dataIndex: "name", key: "name",},
         {title: "Status", dataIndex: "status", key: "status",},
-        {title: "Category", dataIndex: "category", key: "category",},
+        {
+            title: "Category",
+            dataIndex: "category.name",
+            key: "category.name",
+            render: (_, product) => product.category?.name ?? "-"
+        },
         {title: "Condition", dataIndex: "condition", key: "condition",},
         {title: "Stock", dataIndex: "stock", key: "stock",},
         {title: "SKU", dataIndex: "sku", key: "sku",},
