@@ -6,6 +6,7 @@ import {Card, message, notification, Popconfirm} from 'antd';
 import SaveModal from "./Patials/SaveModal.tsx";
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
+import {Role} from "../../../../enums/auth.ts";
 
 const UserManagement = () => {
 
@@ -19,7 +20,7 @@ const UserManagement = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [role, setRole] = useState('admin');
+    const [role, setRole] = useState(Role.admin);
     const [password, setPassword] = useState("");
     const [axiosController, setAxiosController] = useState(new AbortController());
 
@@ -67,7 +68,7 @@ const UserManagement = () => {
             setName('');
             setEmail('');
             setPassword('');
-            setRole('admin');
+            setRole(Role.admin);
         }
     }, [selectedUser]);
 

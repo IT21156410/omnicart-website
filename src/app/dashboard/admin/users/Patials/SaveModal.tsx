@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button, Form, Modal} from "react-bootstrap";
 import {User} from "../../../../../types";
+import {Role} from "../../../../../enums/auth.ts";
 
 const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, state}: {
     selectedUser: User | null,
@@ -12,8 +13,8 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
         setName: (name: string) => void;
         email: string;
         setEmail: (email: string) => void;
-        role: string;
-        setRole: (role: string) => void;
+        role: Role;
+        setRole: (role: Role) => void;
         password: string;
         setPassword: (role: string) => void;
     }
@@ -26,7 +27,7 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
             <Modal.Body>
                 <Form>
                     <Form.Group className="mb-3" controlId="formUserName">
-                        <Form.Label>Full Name</Form.Label>
+                        <Form.Label column="sm">Full Name</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter user name"
@@ -49,13 +50,13 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
                         <Form.Select
                             //defaultValue={selectedUser?.role || 'admin'}
                             value={state.role}
-                            onChange={(e) => state.setRole(e.target.value)}>
-                            <option value="admin">Administrator</option>
-                            <option value="vendor">Vendor</option>
-                            <option value="csr">CSR</option>
+                            onChange={(e) => state.setRole(e.target.value as Role)}>
+                            <option value={Role.admin}>Administrator</option>
+                            <option value={Role.vendor}>Vendor</option>
+                            <option value={Role.csr}>CSR</option>
                         </Form.Select>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="formUserPassword">
+                    {!selectedUser && <Form.Group className="mb-3" controlId="formUserPassword">
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                             type="password"
@@ -63,7 +64,8 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
                             //defaultValue={selectedUser?.password || ''}
                             value={state.password}
                             onChange={(e) => state.setPassword(e.target.value)}/>
-                    </Form.Group>
+                    </Form.Group>}
+
                 </Form>
             </Modal.Body>
             <Modal.Footer>
