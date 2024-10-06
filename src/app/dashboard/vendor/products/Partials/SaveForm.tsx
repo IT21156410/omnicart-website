@@ -16,16 +16,11 @@ import fallback from "../../../../../assets/falback.png"
 import {useNavigate} from "react-router-dom";
 import {Category} from "../../../../../types/models/category.ts";
 import {CategoryService} from "../../../../../services/CategoryService.ts";
+import {getBase64} from "../../../../../utils/util.ts";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
-const getBase64 = (file: FileType): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
+
 
 type SaveFormPropsBase<T> = {
     onSubmit: (data: T) => Promise<boolean | undefined>;

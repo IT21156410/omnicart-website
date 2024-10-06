@@ -2,6 +2,7 @@ import React from 'react';
 import {
     AppstoreOutlined,
     CodepenOutlined,
+    DeploymentUnitOutlined,
     ProductOutlined,
     SettingOutlined,
     UnorderedListOutlined,
@@ -21,6 +22,12 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const openSubMenuKeys = [];
 
     switch (location.pathname) {
+        case "/admin/users":
+            openSubMenuKeys.push('/admin/users')
+            break;
+        case "/admin/categories":
+            openSubMenuKeys.push('categories')
+            break;
         case "/vendor/products":
         case "/vendor/products/create":
             openSubMenuKeys.push('products')
@@ -42,16 +49,22 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             onClick: () => navigate("/admin/users")
         },
         {
-            key: 'products',
+            key: '/admin/categories',
+            icon: <DeploymentUnitOutlined/>,
+            label: 'Category',
+            onClick: () => navigate("/admin/categories")
+        },
+        {
+            key: '/admin/products',
             icon: <ProductOutlined/>,
             label: 'Product',
             onClick: () => navigate("/admin/products")
         },
-        {
-            key: '3',
-            icon: <SettingOutlined/>,
-            label: 'Profile',
-        },
+        // {
+        //     key: '3',
+        //     icon: <SettingOutlined/>,
+        //     label: 'Profile',
+        // },
     ]
     const vendorRoutes = [
         {
@@ -79,11 +92,11 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                 },
             ]
         },
-        {
-            key: '3',
-            icon: <SettingOutlined/>,
-            label: 'Profile',
-        },
+        // {
+        //     key: '3',
+        //     icon: <SettingOutlined/>,
+        //     label: 'Profile',
+        // },
     ]
 
     const getRoutes = (role: string) => {

@@ -15,6 +15,12 @@ export class CategoryService {
         return res.data;
     }
 
+    public static async getCategoryById(productId: string): Promise<AppResponse<Category>> {
+        const ep = ApiUtils.adminUrl(`categories/${productId}`);
+        const res = await this.api().get<Partial<Category>, AxiosAppResponse<Category>>(ep);
+        return res.data;
+    }
+
     public static async create(createData: CreateCategoryData): Promise<AppResponse<Category>> {
 
         // const data = convertToAPIObj(createData);
