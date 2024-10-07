@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Image, message, Popconfirm, Select, Table, TableProps, Tag, Tooltip} from "antd";
+import {Button, Card, Image, Input, message, Modal, Popconfirm, Select, Table, TableProps, Tag, Tooltip} from "antd";
 import {Product, ProductStatus, statusColors} from "../../../../types/models/product.ts";
 import {ProductService} from "../../../../services/ProductService.ts";
 import axios from "axios";
@@ -16,8 +16,43 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState<boolean>(true);
     const [statusChanging, setStatusChanging] = useState<boolean>(false)
+    const [stockChanging, setStockChanging] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null);
     const [axiosController, setAxiosController] = useState(new AbortController());
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+
+    const showStockModal = (product: Product) => {
+        setIsModalOpen(true);
+        setSelectedProduct(product);
+    };
+
+    const saveStock = async () => {
+        if (!selectedProduct) return;
+        setStockChanging(true);
+        try {
+            const result = await ProductService.updateProductStock(selectedProduct!.id!, selectedProduct!.stock);
+            if (result.success) {
+                message.success(result.message);
+                setProducts(prevProducts =>
+                    prevProducts.map(p =>
+                        p.id === result.data.id ? result.data : p
+                    )
+                );
+            }
+        } catch (e) {
+            message.error('Error updating product stock');
+        } finally {
+            setStockChanging(false);
+            setIsModalOpen(false);
+            setSelectedProduct(null);
+        }
+    };
+
+    const cancelStockEdit = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+    };
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -58,7 +93,7 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             fixed: 'left',
             render: (_, product) => {
                 return (
-                    <div className="d-flex justify-content-evenly">
+                    <div className="d-flex gap-2">
                         {user!.role === Role.vendor && (
                             <>
                                 <Tooltip title="Edit product">
@@ -151,7 +186,20 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
             render: (_, product) => product.category?.name ?? "-"
         },
         {title: "Condition", dataIndex: "condition", key: "condition",},
-        {title: "Stock", dataIndex: "stock", key: "stock",},
+        {
+            title: "Stock", dataIndex: "stock", key: "stock", render: (_, product) => (
+                <div className="d-inline-flex">
+                    {product.stock}
+                    {user?.role === Role.vendor && <Tooltip title="Manage product item stock"><Button
+                        type="link"
+                        // href={`/vendor/products/${product.id}/edit`}
+                        icon={<EditOutlined/>}
+                        size="small"
+                        onClick={() => showStockModal(product)}
+                    /></Tooltip>}
+                </div>
+            )
+        },
         {title: "SKU", dataIndex: "sku", key: "sku",},
         {title: "Price (LKR)", dataIndex: "price", key: "price",},
         {title: "Discount (LKR)", dataIndex: "discount", key: "discount",},
@@ -206,6 +254,21 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
     return (
         <Card loading={loading} title="Manage Products">
             <Table<Product> rowKey="id" columns={columns} dataSource={products}/>
+            {
+                selectedProduct &&
+                <Modal title="Manage Stock Items" open={isModalOpen} onOk={saveStock} onCancel={cancelStockEdit}>
+                    <Input
+                        onChange={(e) => {
+                            setSelectedProduct({...selectedProduct!, stock: parseInt(e.target.value)});
+                        }}
+                        value={selectedProduct.stock}
+                        type="number"
+                        placeholder="Input a number"
+                        maxLength={16}
+                    />
+                </Modal>
+            }
+
         </Card>
     );
 };

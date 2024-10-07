@@ -56,7 +56,7 @@ export class ProductService {
 
     // Update product stock
     public static async updateProductStock(productId: string, newStock: number): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.adminUrl(`products/${productId}/stock`);
+        const ep = ApiUtils.vendorUrl(`products/${productId}/stock`);
         const res = await this.api().patch<{ stock: number }, AxiosAppResponse<Product>>(ep, {stock: newStock});
         return res.data;
     }
