@@ -61,6 +61,12 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             label: 'Product',
             onClick: () => navigate("/admin/products")
         },
+        {
+            key: '/admin/orders',
+            icon: <ProductOutlined/>,
+            label: 'Order',
+            onClick: () => navigate("/admin/orders")
+        },
         // {
         //     key: '3',
         //     icon: <SettingOutlined/>,
@@ -103,12 +109,6 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                     icon: <UnorderedListOutlined/>,
                     label: 'Manage Orders',
                     onClick: () => navigate("/vendor/orders")
-                },
-                {
-                    key: "/vendor/orders/create",
-                    icon: <CodepenOutlined/>,
-                    label: 'Add Order',
-                    onClick: () => navigate("/vendor/orders/create")
                 },
             ]
         },
