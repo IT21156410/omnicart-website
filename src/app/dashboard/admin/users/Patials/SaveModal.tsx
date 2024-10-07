@@ -20,7 +20,7 @@ const SaveModal = ({selectedUser, showModal, handleCloseModal, handleSaveUser, s
     }
 }) => {
     return (
-        <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal show={showModal} onHide={handleCloseModal} backdrop="static" >
             <Modal.Header closeButton>
                 <Modal.Title>{selectedUser ? 'Edit User' : 'Add New User'}</Modal.Title>
             </Modal.Header>

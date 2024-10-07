@@ -18,4 +18,8 @@ export class ApiUtils {
         return this.apiUrl + `/api/vendor/` + path;
     }
 
+    public static csrUrl(path: string, apiVersion?: string): string {
+        return this.apiUrl + `/api/csr/` + path;
+    }
+
 }

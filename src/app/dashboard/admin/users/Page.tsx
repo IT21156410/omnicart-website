@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Accordion, Button, Dropdown, FormControl, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card, message, notification, Popconfirm} from 'antd';
+import {Card, message, notification, Popconfirm, Switch, Tag, Tooltip} from 'antd';
 import SaveModal from "./Patials/SaveModal.tsx";
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
@@ -109,6 +109,10 @@ const UserManagement = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedUser(null);
+        setName('');
+        setEmail('');
+        setPassword('');
+        setRole(Role.admin);
     };
 
     const createUser = async () => {
@@ -136,7 +140,18 @@ const UserManagement = () => {
             setUsers(updatedUsers);
         }
     }
-
+    const onChangeProductStatus = async (user: User, checked: boolean) => {
+        try {
+            const result = await UserService.updateUserStatus(user!.id!, checked);
+            if (result.success) {
+                message.success(result.message);
+                setAxiosController(new AbortController());
+            }
+        } catch (e) {
+            message.error('Error updating user status');
+        } finally {
+        }
+    };
     // Add or update user logic
     const handleSaveUser = async () => {
         try {
@@ -145,6 +160,7 @@ const UserManagement = () => {
             } else {
                 await createUser()
             }
+            handleCloseModal();
         } catch (err: any) {
             console.log(err)
             if (axios.isCancel(err)) {
@@ -163,7 +179,6 @@ const UserManagement = () => {
         } finally {
             setLoading(false);
         }
-        handleCloseModal();
     };
     return (
         <Card
@@ -200,36 +215,45 @@ const UserManagement = () => {
             <Table striped bordered hover>
                 <thead>
                 <tr>
+                    <th>Actions</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Actions</th>
+                    <th>Account Status</th>
                 </tr>
                 </thead>
                 <tbody>
                 {users.map((user) => (
                     <tr key={user.id}>
+                        <td>
+                            <div className="d-flex gap-2">
+                                <Button variant="warning" size="sm" onClick={() => handleEditUser(user)}>
+                                    Edit
+                                </Button>{' '}
+                                <Popconfirm
+                                    title="Delete the user"
+                                    description="Are you sure to delete this user?"
+                                    onConfirm={() => handleDeleteUser(user.id)}
+                                    okButtonProps={{loading: loading}}
+                                    onCancel={() => message.warning("Canceled")}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button variant="danger" size="sm">
+                                        Delete
+                                    </Button>
+                                </Popconfirm>
+                                <Tooltip title="Approve/Deactivate this user account">
+                                    <Switch value={user.isActive}
+                                            onChange={(value) => onChangeProductStatus(user, value)}/>
+                                </Tooltip>
+                            </div>
+                        </td>
                         <td>{user.name}</td>
                         <td>{user.email}</td>
                         <td>{user.role}</td>
-                        <td>
-                            <Button variant="warning" size="sm" onClick={() => handleEditUser(user)}>
-                                Edit
-                            </Button>{' '}
-                            <Popconfirm
-                                title="Delete the user"
-                                description="Are you sure to delete this user?"
-                                onConfirm={() => handleDeleteUser(user.id)}
-                                okButtonProps={{loading: loading}}
-                                onCancel={() => message.warning("Canceled")}
-                                okText="Yes"
-                                cancelText="No"
-                            >
-                                <Button variant="danger" size="sm">
-                                    Delete
-                                </Button>
-                            </Popconfirm>
-                        </td>
+                        <td>{user.isActive ? <Tag color="success">Activated</Tag> :
+                            <Tag color="red">Not Activated</Tag>}</td>
                     </tr>
                 ))}
                 </tbody>
