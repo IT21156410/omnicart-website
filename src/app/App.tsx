@@ -18,6 +18,9 @@ import {AuthService} from "../services/AuthService.ts";
 import ManageCategories from "./dashboard/admin/categories/ManageCategories.tsx";
 import CreateCategory from "./dashboard/admin/categories/Create.tsx";
 import EditCategory from "./dashboard/admin/categories/Edit.tsx";
+import ManageOrders from "./dashboard/vendor/orders/ManageOrders.tsx";
+import CreateOrder from "./dashboard/vendor/orders/Create.tsx";
+import UpdateOrder from "./dashboard/vendor/orders/Edit.tsx";
 
 const getUserData = () =>
     new Promise((resolve) => {
@@ -58,6 +61,9 @@ export const router = createBrowserRouter(
                     <Route path="products" element={<ManageProducts/>}/>
                     <Route path="products/create" element={<CreateProduct/>}/>
                     <Route path="products/:id/edit" element={<UpdateProduct/>}/>
+                    <Route path="orders" element={<ManageOrders/>}/>
+                    <Route path="orders/create" element={<CreateOrder/>}/>
+                    <Route path="orders/:id/edit" element={<UpdateOrder/>}/>
                 </Route>
             </Route>
         </Route>

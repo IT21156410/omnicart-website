@@ -16,6 +16,7 @@ import {useAuth} from "../../hooks/useAuth.tsx";
 
 const {Header, Sider, Content} = Layout;
 export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
+
     const {user} = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -89,6 +90,25 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                     icon: <CodepenOutlined/>,
                     label: 'Add Product',
                     onClick: () => navigate("/vendor/products/create")
+                },
+            ]
+        },
+        {
+            key: 'orders',
+            icon: <ProductOutlined/>,
+            label: 'Order',
+            children: [
+                {
+                    key: "/vendor/orders",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Manage Orders',
+                    onClick: () => navigate("/vendor/orders")
+                },
+                {
+                    key: "/vendor/orders/create",
+                    icon: <CodepenOutlined/>,
+                    label: 'Add Order',
+                    onClick: () => navigate("/vendor/orders/create")
                 },
             ]
         },
