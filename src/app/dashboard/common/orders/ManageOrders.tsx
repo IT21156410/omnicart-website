@@ -27,7 +27,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
     const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null);
 
     const filteredOrders = orders.filter(order =>
-        order.orderNumber.includes(searchText) &&
+        order.orderNumber?.includes(searchText) &&
         (statusFilter ? order.status === statusFilter : true)
     );
 
@@ -72,7 +72,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
             fixed: 'left',
             render: (_, order) => {
                 return (
-                    <div className="d-flex justify-content-evenly">
+                    <div className="d-flex flex-column justify-content-start align-items-start gap-3">
                         {(user!.role === Role.admin || user!.role === Role.csr) && (
                             <>
                                 <Select<OrderStatus>
@@ -194,7 +194,11 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                     );
                 }
             } catch (e) {
-                message.error('Error updating order status');
+                let error = 'Error updating order status';
+                if (e?.response?.data?.message) {
+                    error = e?.response?.data?.message;
+                }
+                message.error(error);
             } finally {
                 setStatusChanging(false);
             }
@@ -218,7 +222,11 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                 );
             }
         } catch (e) {
-            message.error("Error updating item status");
+            let error = 'Error updating item status';
+            if (e?.response?.data?.message) {
+                error = e?.response?.data?.message;
+            }
+            message.error(error);
         }
     };
 
@@ -243,7 +251,11 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                 } : o));
             }
         } catch (e) {
-            message.error("Error cancelling order");
+            let error = 'Error cancelling order';
+            if (e?.response?.data?.message) {
+                error = e?.response?.data?.message;
+            }
+            message.error(error);
         } finally {
             setCancelNoteVisible(false);
             setCancelNote('');

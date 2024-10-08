@@ -192,7 +192,11 @@ const ManageOrdersVendor = () => {
                 );
             }
         } catch (e) {
-            message.error("Error updating item status");
+            let error = 'Error updating item status';
+            if (e?.response?.data?.message) {
+                error = e?.response?.data?.message;
+            }
+            message.error(error);
         }
     };
 
