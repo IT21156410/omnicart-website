@@ -6,15 +6,6 @@ export default function Footer() {
         <Container className='text-center pt-5 mt-5' style={{fontSize: "10px"}}>
             <Row>
                 <Col>
-                    <p>
-                        Beautiful Home Store Ltd. <br/>
-                        1234 Commerce Street, Beautiful City-RS ZIP: 91234-567 <br/>
-                        Beautiful.home@bh-store.com <br/>
-                        (51) 4000-0001 | (51) 9999-9999
-                    </p>
-                </Col>
-
-                <Col>
                     <a href="/">
                         <img
                             src={"/omni-cart.webp"}

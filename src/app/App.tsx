@@ -72,6 +72,9 @@ export const router = createBrowserRouter(
                     <Route path="orders" element={<ManageOrdersCSR/>}/>
                     <Route path="cancel-requests" element={<ManageCancelRequests />}/>
                 </Route>
+                <Route path="/customer">
+                    <Route path="dashboard" element={<Dashboard/>}/>
+                </Route>
             </Route>
         </Route>
     )

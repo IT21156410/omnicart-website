@@ -89,11 +89,6 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                 },
             ]
         },
-        // {
-        //     key: '3',
-        //     icon: <SettingOutlined/>,
-        //     label: 'Profile',
-        // },
     ]
     const csrRoutes = [
         {
@@ -167,11 +162,6 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                 },
             ]
         },
-        // {
-        //     key: '3',
-        //     icon: <SettingOutlined/>,
-        //     label: 'Profile',
-        // },
     ]
 
     const getRoutes = (role: string) => {

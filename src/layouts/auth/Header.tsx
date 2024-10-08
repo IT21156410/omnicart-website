@@ -2,6 +2,7 @@ import React from 'react';
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {Button, Layout, theme} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
+import {useNavigate} from "react-router-dom";
 
 const {Header} = Layout;
 
@@ -9,7 +10,9 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
     collapsed: boolean,
     setCollapsed: (collapsed: boolean) => void
 }) => {
+
     const {user, logout} = useAuth();
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         await logout();
@@ -39,9 +42,19 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
                 <Button
                     type="default"
                     onClick={handleLogout}
+                    className="mx-1"
                 >
                     <strong>
                         <i className="bi bi-box-arrow-in-right text-dark" style={{fontSize: '24px'}}></i>
+                    </strong>
+                </Button>
+                <Button
+                    type="default"
+                    onClick={() => navigate("/")}
+                    className="mx-1"
+                >
+                    <strong>
+                        <i className="bi bi-house text-dark" style={{fontSize: '24px'}}></i>
                     </strong>
                 </Button>
             </div>

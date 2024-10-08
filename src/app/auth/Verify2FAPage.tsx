@@ -35,9 +35,9 @@ export const Verify2FAPage = () => {
         try {
             setIsDisable(true);
             const res = await verify2FACode({code: code, email: user?.email || ""});
-            if (res.success) {
+            if (res?.success) {
                 addNotification(res.message, "success", "Success");
-                navigate("/admin/dashboard");
+                navigate(`/${user.role}/dashboard`);
             } else {
                 setErrors("Invalid code. Please try again.");
             }
@@ -59,7 +59,7 @@ export const Verify2FAPage = () => {
             setResendMessage(null);
             setIsDisable(true);
             const res = await send2FAVerifyCode(user?.email || "");
-            if (res.success) {
+            if (res?.success) {
                 setResendMessage("Code sent! Please check your email.");
                 addNotification(res.message, "success", "Info");
             }

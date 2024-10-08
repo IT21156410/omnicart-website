@@ -2,12 +2,12 @@ import React from 'react';
 import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
 import ModalContact from './ModalContact';
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 export default function Menu() {
   const navigate = useNavigate();
   const [modalShow, setModalShow] = React.useState(false);
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -31,7 +31,7 @@ export default function Menu() {
 
               <Button
                   variant='warning'
-                  className='mx-2'
+                  className='ms-2 me-5 h-25'
                   onClick={() => setModalShow(true)}
                   style={{ backgroundColor: '#ffcc00', borderColor: '#ffcc00' }}
               >
@@ -42,19 +42,31 @@ export default function Menu() {
                       variant='primary'
                       className='mx-2 h-25'
                       onClick={() => navigate("/login")}
-                      style={{ backgroundColor: '#0066cc', borderColor: '#0066cc' }}
+                      style={{ backgroundColor: '#000106', borderColor: '#000106' }}
                   >
                     Login
                   </Button>
               ) : (
-                  <Button
-                      variant='danger'
-                      className='mx-2 h-25'
-                      onClick={handleLogout}
-                      style={{ backgroundColor: '#000106', borderColor: '#000106' }}
-                  >
-                    Logout
-                  </Button>
+                  <>
+                    {user && token &&
+                        <Button
+                            variant='danger'
+                            className='mx-2 h-25'
+                            onClick={() => navigate(`/${user.role}/dashboard`)}
+                            style={{ backgroundColor: '#000106', borderColor: '#000106' }}
+                        >
+                          Dashboard
+                        </Button>
+                    }
+                    <Button
+                        variant='danger'
+                        className='mx-2 h-25'
+                        onClick={handleLogout}
+                        style={{ backgroundColor: '#000106', borderColor: '#000106' }}
+                    >
+                      Logout
+                    </Button>
+                  </>
               )}
               <ModalContact show={modalShow} onHide={() => setModalShow(false)} />
             </Nav>

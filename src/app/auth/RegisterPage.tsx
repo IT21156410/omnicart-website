@@ -245,7 +245,7 @@ export const RegisterPage = () => {
                                         onChange={roleChange}
                                     >
                                         <option value="">Select your role</option>
-                                        <option value="user">User</option>
+                                        <option value="customer">User</option>
                                         <option value="admin">Admin</option>
                                     </Form.Select>
                                     <Form.Text className="text-danger">
