@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../../../hooks/useAuth.tsx";
 import {Role} from "../../../../enums/auth.ts";
 
-const ManageOrdersVendor = () => {
+const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
 
     const {user} = useAuth();
     const navigate = useNavigate();
