@@ -19,9 +19,9 @@ import ManageCategories from "./dashboard/admin/categories/ManageCategories.tsx"
 import CreateCategory from "./dashboard/admin/categories/Create.tsx";
 import EditCategory from "./dashboard/admin/categories/Edit.tsx";
 import ManageOrdersVendor from "./dashboard/vendor/orders/ManageOrdersVendor.tsx";
-import ManageOrders from "./dashboard/common/orders/ManageOrders.tsx";
 import ManageOrdersCSR from "./dashboard/csr/orders/ManageOrdersCSR.tsx";
 import ManageOrdersAdmin from "./dashboard/admin/orders/ManageOrdersAdmin.tsx";
+import ManageCancelRequests from "./dashboard/common/orders/ManageCancelRequests.tsx";
 
 const getUserData = () =>
     new Promise((resolve) => {
@@ -55,6 +55,7 @@ export const router = createBrowserRouter(
                     <Route path="categories/create" element={<CreateCategory/>}/>
                     <Route path="categories/:id/edit" element={<EditCategory/>}/>
                     <Route path="orders" element={<ManageOrdersAdmin isAdmin/>}/>
+                    <Route path="cancel-requests" element={<ManageCancelRequests isAdmin/>}/>
                     {/*<Route path="profile" element={<ProfilePage/>}/>*/}
                 </Route>
                 <Route path="/vendor">
@@ -69,6 +70,7 @@ export const router = createBrowserRouter(
                 <Route path="/csr">
                     <Route path="dashboard" element={<Dashboard/>}/>
                     <Route path="orders" element={<ManageOrdersCSR/>}/>
+                    <Route path="cancel-requests" element={<ManageCancelRequests />}/>
                 </Route>
             </Route>
         </Route>

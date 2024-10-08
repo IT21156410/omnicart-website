@@ -37,6 +37,8 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             break;
         case "/admin/orders":
         case "/csr/orders":
+        case "/admin/cancel-requests":
+        case "/csr/cancel-requests":
         case "/vendor/orders":
             openSubMenuKeys.push('orders')
             break;
@@ -69,10 +71,23 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             onClick: () => navigate("/admin/products")
         },
         {
-            key: '/admin/orders',
+            key: 'orders',
             icon: <ProductOutlined/>,
             label: 'Order',
-            onClick: () => navigate("/admin/orders")
+            children: [
+                {
+                    key: "/admin/orders",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Manage Orders',
+                    onClick: () => navigate("/admin/orders")
+                },
+                {
+                    key: "/admin/cancel-requests",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Order Cancellation Requests',
+                    onClick: () => navigate("/admin/cancel-requests")
+                },
+            ]
         },
         // {
         //     key: '3',
@@ -97,6 +112,12 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                     icon: <UnorderedListOutlined/>,
                     label: 'Manage Orders',
                     onClick: () => navigate("/csr/orders")
+                },
+                {
+                    key: "/csr/cancel-requests",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Order Cancellation Requests',
+                    onClick: () => navigate("/csr/cancel-requests")
                 },
             ]
         },
