@@ -1,58 +1,48 @@
-import {Link, useNavigate} from "react-router-dom";
-import {Button, Image} from "antd";
-import React from "react";
-import {useAuth} from "../../hooks/useAuth.tsx";
+import React from 'react';
+import { Button, Container, Nav, Navbar } from 'react-bootstrap';
+import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+import Menu from '../../components/landing-components/Menu';
+import Slider from '../../components/landing-components/Slider';
+import TypeProducts from '../../components/landing-components/TypeProducts';
+import Newsletter from '../../components/landing-components/Newsletter';
+import Footer from '../../components/landing-components/Footer';
+
+export default function Home() {
 
     const navigate = useNavigate();
-    const {user, token, logout} = useAuth();
-
-    const handleLogout = async () => {
-        await logout();
-    };
 
     return (
         <>
-            <div className="d-flex justify-content-between p-4">
-                <div className="">
-                    <div className="d-flex justify-content-around gap-4 align-items-center">
-                        <div className="d-flex justify-content-center align-items-center">
-                            <Image
-                                src={"/omni-cart.webp"}
-                                style={{maxWidth: '60px', height: 'auto', cursor: 'pointer'}}
-                                preview={false}
-                                onClick={() => navigate("/")}
-                            />
-                        </div>
-                        {user && token &&
-                            <Link to={`/${user.role}/dashboard`}>Dashboard</Link>
-                        }
-                        {!(user && token) && (<>
-                                <Link to="/">Home</Link>
-                                <Link to="/login">Login</Link>
-                            </>
-                        )}
+            <Menu />
+            <Slider />
+            <section className="py-5 bg-light">
+                <h2 className="text-center" style={{ color: '#0066cc' }}>Explore Product Categories</h2>
+                <p className="text-center text-muted">Discover a wide range of products</p>
+                <TypeProducts />
+            </section>
+            <section className="my-5 text-center">
+                <div className="bloco-post d-flex align-items-center justify-content-center flex-wrap">
+                    <div className="post1 p-3">
+                        <img
+                            src="https://via.placeholder.com/300x150"
+                            alt="Black Friday Banner"
+                            width={300}
+                            height={150}
+                            className="rounded"
+                        />
+                    </div>
+                    <div className="post2 text-center p-3">
+                        <h4>Exclusive Black Friday Deals</h4>
+                        <p>Redecorate and refresh your home with our special offers!</p>
+                        <Button variant="dark" size="lg" onClick={() => navigate('/shop')}>
+                            Shop Now
+                        </Button>
                     </div>
                 </div>
-
-                {(user && token) && (
-                    <div style={{marginLeft: 'auto', marginRight: '16px'}}>
-                        <Button
-                            type="default"
-                            onClick={handleLogout}
-                        >
-                            <strong>
-                                <i className="bi bi-box-arrow-in-right text-dark" style={{fontSize: '24px'}}></i>
-                            </strong>
-                        </Button>
-                    </div>)}
-            </div>
-            <div className="d-flex justify-content-between p-4">
-                <h1>This is the Home Page</h1>
-            </div>
+            </section>
+            <Newsletter />
+            <Footer />
         </>
     );
-};
-
-export default Home;
+}
