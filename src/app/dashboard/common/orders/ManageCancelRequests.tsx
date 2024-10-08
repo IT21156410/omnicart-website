@@ -91,7 +91,7 @@ const ManageCancelRequests = ({isAdmin}: { isAdmin?: boolean }) => {
             key: 'operation',
             render: (_, request) => (
                 <div className="d-flex justify-content-evenly">
-                    {user!.role === Role.admin || user!.role === Role.csr   && (
+                    {(user!.role === Role.admin || user!.role === Role.csr)   && (
                         <>
                             <Button
                                 type="primary"
