@@ -7,6 +7,7 @@ import {
     PaymentStatus,
 } from "../types/models/Order.ts";
 import {ApiUtils} from "./api/ApiUtils.ts";
+import {Role} from "../enums/auth.ts";
 
 export class OrderService {
 
@@ -16,8 +17,8 @@ export class OrderService {
     }
 
     // Get all orders
-    public static async getAllOrders(controller?: AbortController, isAdmin?: boolean): Promise<AppResponse<Order[]>> {
-        const ep = isAdmin ? ApiUtils.adminUrl('orders') : ApiUtils.vendorUrl("orders");
+    public static async getAllOrders(role: Role, controller?: AbortController): Promise<AppResponse<Order[]>> {
+        let ep = ApiUtils.epByRole(role, 'orders');
         const res = await this.api().get<Partial<Order>, AxiosAppResponse<Order[]>>(ep, {
             signal: controller?.signal,
         });
@@ -53,9 +54,23 @@ export class OrderService {
     }
 
     // Update order status
-    public static async updateOrderStatus(orderId: string, status: OrderStatus): Promise<AppResponse<Order>> {
-        const ep = ApiUtils.vendorUrl(`orders/${orderId}/status`);
-        const res = await this.api().patch<{ status: number }, AxiosAppResponse<Order>>(ep, status);
+    public static async updateOrderStatus(role: Role, orderId: string, status: OrderStatus): Promise<AppResponse<Order>> {
+        let ep = ApiUtils.epByRole(role, `orders/${orderId}/status`);
+        const res = await this.api().patch<{ status: string }, AxiosAppResponse<Order>>(ep, {status: status});
+        return res.data;
+    }
+
+    // Cancel order with note
+    public static async cancelOrder(orderId: string, note: string, role: Role): Promise<AppResponse<Order>> {
+        let ep = ApiUtils.epByRole(role, `orders/${orderId}/cancel`);
+        const res = await this.api().patch<{ note: string }, AxiosAppResponse<Order>>(ep, {note: note});
+        return res.data;
+    }
+
+    // Update order items
+    public static async updateOrderItemStatus(orderId: string, productId: string, status: OrderStatus, role: Role): Promise<AppResponse<Order>> {
+        let ep = ApiUtils.epByRole(role, `orders/${orderId}/items/${productId}/status`);
+        const res = await this.api().patch<{ status: string }, AxiosAppResponse<Order>>(ep, {status: status});
         return res.data;
     }
 

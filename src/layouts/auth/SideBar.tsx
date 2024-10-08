@@ -33,6 +33,11 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         case "/vendor/products/create":
             openSubMenuKeys.push('products')
             break;
+        case "/admin/orders":
+        case "/csr/orders":
+        case "/vendor/orders":
+            openSubMenuKeys.push('orders')
+            break;
         default:
     }
 
@@ -72,6 +77,27 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         //     icon: <SettingOutlined/>,
         //     label: 'Profile',
         // },
+    ]
+    const csrRoutes = [
+        {
+            key: "/admin/dashboard",
+            icon: <AppstoreOutlined/>,
+            label: 'Dashboard',
+            onClick: () => navigate("/admin/dashboard")
+        },
+        {
+            key: 'orders',
+            icon: <ProductOutlined/>,
+            label: 'Order',
+            children: [
+                {
+                    key: "/csr/orders",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Manage Orders',
+                    onClick: () => navigate("/csr/orders")
+                },
+            ]
+        },
     ]
     const vendorRoutes = [
         {
@@ -123,6 +149,8 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         switch (role) {
             case "admin":
                 return adminRoutes;
+            case "csr":
+                return csrRoutes;
             case "vendor":
                 return vendorRoutes;
         }
