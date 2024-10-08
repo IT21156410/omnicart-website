@@ -61,6 +61,7 @@ export const router = createBrowserRouter(
                     {/* // TODO: add separate or dynamic dashboard according to the role*/}
                     <Route path="dashboard" element={<Dashboard/>}/>
                     <Route path="products" element={<ManageProducts/>}/>
+                    <Route path="products/out-of-stock" element={<ManageProducts filterOutOfStock/>}/>
                     <Route path="products/create" element={<CreateProduct/>}/>
                     <Route path="products/:id/edit" element={<UpdateProduct/>}/>
                     <Route path="orders" element={<ManageOrdersVendor/>}/>

@@ -11,10 +11,14 @@ export class ProductService {
     }
 
     // Get all products
-    public static async getAllProducts(controller?: AbortController, isAdmin?: boolean): Promise<AppResponse<Product[]>> {
-        const ep = isAdmin ? ApiUtils.adminUrl('products') : ApiUtils.vendorUrl("products");
+    public static async getAllProducts(controller?: AbortController, config: {
+        isAdmin?: boolean,
+        filterOutOfStock?: boolean
+    } = {isAdmin: false, filterOutOfStock: false}): Promise<AppResponse<Product[]>> {
+        const ep = config.isAdmin ? ApiUtils.adminUrl('products') : ApiUtils.vendorUrl("products");
         const res = await this.api().get<Partial<Product>, AxiosAppResponse<Product[]>>(ep, {
             signal: controller?.signal,
+            params: {filterOutOfStock: config?.filterOutOfStock},
         });
         return res.data;
     }

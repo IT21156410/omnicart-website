@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    AppstoreAddOutlined,
     AppstoreOutlined,
     CodepenOutlined,
     DeploymentUnitOutlined,
@@ -31,6 +32,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             break;
         case "/vendor/products":
         case "/vendor/products/create":
+        case "/vendor/products/out-of-stock":
             openSubMenuKeys.push('products')
             break;
         case "/admin/orders":
@@ -112,16 +114,22 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             label: 'Product',
             children: [
                 {
+                    key: "/vendor/products/create",
+                    icon: <AppstoreAddOutlined/>,
+                    label: 'Add Product',
+                    onClick: () => navigate("/vendor/products/create")
+                },
+                {
                     key: "/vendor/products",
                     icon: <UnorderedListOutlined/>,
-                    label: 'Manage Products',
+                    label: 'All Products',
                     onClick: () => navigate("/vendor/products")
                 },
                 {
-                    key: "/vendor/products/create",
+                    key: "/vendor/products/out-of-stock",
                     icon: <CodepenOutlined/>,
-                    label: 'Add Product',
-                    onClick: () => navigate("/vendor/products/create")
+                    label: 'Out Of Stock',
+                    onClick: () => navigate("/vendor/products/out-of-stock")
                 },
             ]
         },

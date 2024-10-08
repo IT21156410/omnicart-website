@@ -10,7 +10,7 @@ import {useAuth} from "../../../../hooks/useAuth.tsx";
 import {Role} from "../../../../enums/auth.ts";
 
 
-const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
+const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean, filterOutOfStock?: boolean }) => {
     const {user} = useAuth();
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([])
@@ -21,6 +21,38 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
     const [axiosController, setAxiosController] = useState(new AbortController());
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true)
+                const result = await ProductService.getAllProducts(axiosController, {isAdmin, filterOutOfStock});
+                if (isMounted) {
+                    if (!result.success) {
+                        setError(result.message);
+                    }
+                    setProducts(result.data);
+                }
+            } catch (err: unknown) {
+                if (axios.isCancel(err)) {
+                    setAxiosController(new AbortController());
+                    console.log("Request canceled", err.message);
+                } else if (isMounted) setError("Something went wrong!");
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+
+        let isMounted = true;
+
+        fetchProducts();
+
+        return () => {
+            isMounted = false;
+            axiosController.abort("Component unmounted");
+        };
+    }, [axiosController, location.pathname]);
 
     const showStockModal = (product: Product) => {
         setIsModalOpen(true);
@@ -54,37 +86,6 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
         setSelectedProduct(null);
     };
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                setLoading(true)
-                const result = await ProductService.getAllProducts(axiosController, isAdmin);
-                if (isMounted) {
-                    if (!result.success) {
-                        setError(result.message);
-                    }
-                    setProducts(result.data);
-                }
-            } catch (err: unknown) {
-                if (axios.isCancel(err)) {
-                    setAxiosController(new AbortController());
-                    console.log("Request canceled", err.message);
-                } else if (isMounted) setError("Something went wrong!");
-            } finally {
-                if (isMounted) setLoading(false);
-            }
-        };
-
-
-        let isMounted = true;
-
-        fetchProducts();
-
-        return () => {
-            isMounted = false;
-            axiosController.abort("Component unmounted");
-        };
-    }, [axiosController]);
 
     const columns: TableProps<Product>['columns'] = [
         {
@@ -189,7 +190,7 @@ const ManageProducts = ({isAdmin}: { isAdmin?: boolean }) => {
         {
             title: "Stock", dataIndex: "stock", key: "stock", render: (_, product) => (
                 <div className="d-inline-flex">
-                    {product.stock}
+                    {product.stock <= 0 ? <Tag color="red">Out Of Stock</Tag> : product.stock}
                     {user?.role === Role.vendor && <Tooltip title="Manage product item stock"><Button
                         type="link"
                         // href={`/vendor/products/${product.id}/edit`}
