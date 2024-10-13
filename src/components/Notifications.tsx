@@ -38,9 +38,6 @@ const Notifications = ({open, setOpen}: { open: boolean, setOpen: (value: boolea
         }
     };
 
-    if (loading) {
-        return <div>Loading notifications...</div>;
-    }
 
     return (
         <Drawer

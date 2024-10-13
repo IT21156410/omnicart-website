@@ -100,8 +100,10 @@ class ApiService {
                         message.error(message);
                         break;
                     }
-                    default:
+                    default: {
+                        message.error(error.message);
                         console.error(error);
+                    }
                 }
                 return Promise.reject(error);
             }

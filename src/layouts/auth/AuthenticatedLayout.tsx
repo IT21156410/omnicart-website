@@ -29,7 +29,7 @@ export const ProtectedLayout = () => {
                 <HeaderLayout collapsed={collapsed} setCollapsed={setCollapsed}/>
                 <Breadcrumb
                     className="ms-3"
-                    items={[{title: 'Home'}, {title: 'Dashboard'}]}
+                    items={[{title: 'Home'}, {title: `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard`}]}
                     style={{margin: '16px 0'}}
                 />
                 <Content style={{margin: '0 16px 0', overflow: 'initial'}}>
@@ -43,7 +43,7 @@ export const ProtectedLayout = () => {
                     >  {outlet}
                     </div>
                 </Content>
-                <Layout.Footer style={{background: colorBgContainer,textAlign: 'center'}}>
+                <Layout.Footer style={{background: colorBgContainer, textAlign: 'center'}}>
                     OmniCart ©{new Date().getFullYear()}
                 </Layout.Footer>
             </Layout>
