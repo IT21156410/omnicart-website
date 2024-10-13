@@ -3,8 +3,9 @@ import ApiService from "./api/ApiService.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 
 import {ApiUtils} from "./api/ApiUtils.ts";
-import {Role} from "../enums/auth.ts";
 import {NotificationRequest} from "../types/models/notification.ts";
+
+import {Notification} from '../types/models/notification'
 
 export class NotificationService {
 
@@ -14,11 +15,10 @@ export class NotificationService {
     }
 
     // Get all notifications for a user or roles
-    public static async getNotifications(userId: string, roles: Role, controller?: AbortController): Promise<AppResponse<Notification[]>> {
-        const ep = ApiUtils.publicUrl(`notifications/${userId}`);
+    public static async getNotifications(controller?: AbortController): Promise<AppResponse<Notification[]>> {
+        const ep = ApiUtils.publicUrl(`notifications/my`);
         const res = await this.api().get<Partial<Notification>, AxiosAppResponse<Notification[]>>(ep, {
             signal: controller?.signal,
-            params: {roles}
         });
         return res.data;
     }
@@ -34,6 +34,13 @@ export class NotificationService {
     public static async markNotificationAsRead(notificationId: string): Promise<AppResponse<Notification>> {
         const ep = ApiUtils.publicUrl(`notifications/mark-as-read/${notificationId}`);
         const res = await this.api().post<Partial<Notification>, AxiosAppResponse<Notification>>(ep);
+        return res.data;
+    }
+
+    // Mark a notification as read
+    public static async unreadNotificationCountForUser(): Promise<AppResponse<{ unreadCount: number }>> {
+        const ep = ApiUtils.publicUrl(`notifications/unread-count`);
+        const res = await this.api().get<Partial<Notification>, AxiosAppResponse<{ unreadCount: number }>>(ep);
         return res.data;
     }
 

@@ -4,6 +4,7 @@ export interface Notification {
     id: string;
     userId?: string;
     roles?: Role;
+    title: string;
     message: string;
     isRead: boolean;
     createdAt: string;

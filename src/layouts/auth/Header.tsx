@@ -3,6 +3,8 @@ import {useAuth} from "../../hooks/useAuth.tsx";
 import {Button, Layout, theme} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
+import Notifications from "../../components/Notifications.tsx";
+import NotificationBellButton from "../../components/NotificationBellButton.tsx";
 
 const {Header} = Layout;
 
@@ -13,12 +15,17 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
 
     const {user, logout} = useAuth();
     const navigate = useNavigate();
+    const [open, setOpen] = React.useState<boolean>(false);
 
     const handleLogout = async () => {
         await logout();
     };
 
     const {token: {colorBgContainer, borderRadiusLG}} = theme.useToken();
+
+    const showDrawer = () => {
+        setOpen(true);
+    };
 
     return (
         <Header style={{
@@ -38,7 +45,8 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
                     height: 64,
                 }}
             />
-            <div style={{marginLeft: 'auto', marginRight: '16px'}}>
+            <div className="d-flex" style={{marginLeft: 'auto', marginRight: '16px'}}>
+                <NotificationBellButton showDrawer={showDrawer}/>
                 <Button
                     type="default"
                     onClick={handleLogout}
@@ -58,6 +66,7 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
                     </strong>
                 </Button>
             </div>
+            <Notifications open={open} setOpen={setOpen}/>
         </Header>
     );
 };
