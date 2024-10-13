@@ -167,7 +167,7 @@ const UserManagement = () => {
                 setAxiosController(new AbortController());
                 console.log("handleSaveUser Request canceled", err.message);
             } else {
-                api.open({
+                api.error({
                     message: err.message,
                     //description: "Something went wrong!",
                     showProgress: true,
@@ -175,6 +175,7 @@ const UserManagement = () => {
                     type: "error",
                 });
                 setError("Something went wrong!");
+                message.error(err.response.data.message || err.message);
             }
         } finally {
             setLoading(false);

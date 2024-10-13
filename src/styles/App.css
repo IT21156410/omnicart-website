@@ -1,0 +1,7 @@
+.ant-layout-sider-collapsed .collapsed-logo {
+    display: block !important;
+}
+
+.ant-layout-sider-collapsed .logo {
+    display: none;
+}

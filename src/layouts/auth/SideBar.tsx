@@ -1,11 +1,11 @@
 import React from 'react';
 import {
     AppstoreAddOutlined,
-    AppstoreOutlined,
     CodepenOutlined,
+    DashboardOutlined,
     DeploymentUnitOutlined,
     ProductOutlined,
-    SettingOutlined,
+    TruckFilled,
     UnorderedListOutlined,
     UsergroupAddOutlined
 } from "@ant-design/icons";
@@ -14,6 +14,8 @@ import {useLocation, useNavigate} from "react-router-dom";
 
 import {Layout, Menu, theme} from "antd";
 import {useAuth} from "../../hooks/useAuth.tsx";
+import omnicartBlue from "../../assets/omnicart-blue.png"
+import omnicartLogo from "../../assets/omnicart-logo.png"
 
 const {Header, Sider, Content} = Layout;
 export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
@@ -48,7 +50,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const adminRoutes = [
         {
             key: "/admin/dashboard",
-            icon: <AppstoreOutlined/>,
+            icon: <DashboardOutlined/>,
             label: 'Dashboard',
             onClick: () => navigate("/admin/dashboard")
         },
@@ -72,7 +74,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         },
         {
             key: 'orders',
-            icon: <ProductOutlined/>,
+            icon: <TruckFilled/>,
             label: 'Order',
             children: [
                 {
@@ -93,13 +95,13 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const csrRoutes = [
         {
             key: "/admin/dashboard",
-            icon: <AppstoreOutlined/>,
+            icon: <DashboardOutlined/>,
             label: 'Dashboard',
             onClick: () => navigate("/admin/dashboard")
         },
         {
             key: 'orders',
-            icon: <ProductOutlined/>,
+            icon: <TruckFilled/>,
             label: 'Order',
             children: [
                 {
@@ -120,7 +122,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     const vendorRoutes = [
         {
             key: "/vendor/dashboard",
-            icon: <AppstoreOutlined/>,
+            icon: <DashboardOutlined/>,
             label: 'Dashboard',
             onClick: () => navigate("/vendor/dashboard")
         },
@@ -151,7 +153,7 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         },
         {
             key: 'orders',
-            icon: <ProductOutlined/>,
+            icon: <TruckFilled/>,
             label: 'Order',
             children: [
                 {
@@ -185,7 +187,10 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             breakpoint="lg"
             collapsedWidth="70"
         >
-            <div className={sideBarStyles.siderLogo}/>
+            <div className={sideBarStyles.siderLogo} style={{backgroundImage: omnicartBlue}}>
+                <img src={omnicartBlue} width='180px' height="45px" alt="logo" className="logo"/>
+                <img src={omnicartLogo} height="45px" alt="logo" className="collapsed-logo d-none"/>
+            </div>
             <Menu
                 theme="light"
                 mode="inline"
