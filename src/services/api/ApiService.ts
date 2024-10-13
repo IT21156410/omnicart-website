@@ -4,6 +4,7 @@ import {AppResponse} from "../../types/http-service/response";
 // import * as Bowser from 'bowser';
 import Bowser from 'bowser';
 import ServiceUtils from "./ServiceUtils.ts";
+import {message} from "antd";
 
 class ApiService {
 
@@ -80,27 +81,27 @@ class ApiService {
             (error: AxiosError<any>) => {
                 switch (error.response?.status) {
                     case 0:
-                        console.warn('Error, Please check logs.');
+                        message.warning('Error, Please check logs.');
                         break;
                     case 500:
-                        console.warn('An internal server error occurred.');
+                        message.error('An internal server error occurred.');
                         break;
                     case 403:
-                        console.warn('You are not allowed to perform this action! Forbidden.');
+                        message.error('You are not allowed to perform this action! Forbidden.');
                         break;
                     case 401:
-                        console.warn('You are not allowed to perform this action! Unauthorized.');
+                        message.error('You are not allowed to perform this action! Unauthorized.');
                         break;
                     case 400:
-                        console.warn('Bad Request');
+                        message.error('Bad Request');
                         break;
                     case 422: {
                         const message = 'message' in error.response?.data ? error.response?.data.message : error.response?.data;
-                        console.warn(message);
+                        message.error(message);
                         break;
                     }
                     default:
-                        console.warn(error);
+                        console.error(error);
                 }
                 return Promise.reject(error);
             }

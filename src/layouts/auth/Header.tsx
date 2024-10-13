@@ -45,7 +45,11 @@ export const HeaderLayout = ({collapsed, setCollapsed}: {
                     height: 64,
                 }}
             />
-            <div className="d-flex" style={{marginLeft: 'auto', marginRight: '16px'}}>
+            <div className="d-flex">
+                <div className="m-0">{user?.role.toLocaleUpperCase()} Dashboard</div>
+            </div>
+            <div className="d-flex align-items-center" style={{marginLeft: 'auto', marginRight: '16px'}}>
+                <div className="me-2"> {user?.name}</div>
                 <NotificationBellButton showDrawer={showDrawer}/>
                 <Button
                     type="default"
