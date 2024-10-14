@@ -154,7 +154,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                                 (role == Role.admin)
                                 && (order.status !== OrderStatus.Delivered
                                     && order.status !== OrderStatus.Cancelled)
-                                    || (item.status !== OrderStatus.Delivered
+                                || (item.status !== OrderStatus.Delivered
                                     && item.status !== OrderStatus.Cancelled) ? <Select<OrderStatus>
                                     defaultValue={item.status}
                                     style={{width: 150}}
@@ -193,7 +193,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                         )
                     );
                 }
-            } catch (e) {
+            } catch (e: any) {
                 let error = 'Error updating order status';
                 if (e?.response?.data?.message) {
                     error = e?.response?.data?.message;
@@ -221,7 +221,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                     )
                 );
             }
-        } catch (e) {
+        } catch (e: any) {
             let error = 'Error updating item status';
             if (e?.response?.data?.message) {
                 error = e?.response?.data?.message;
@@ -250,7 +250,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                     status: OrderStatus.Cancelled
                 } : o));
             }
-        } catch (e) {
+        } catch (e: any) {
             let error = 'Error cancelling order';
             if (e?.response?.data?.message) {
                 error = e?.response?.data?.message;
@@ -293,7 +293,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
             <Table<Order> rowKey="id" columns={columns} dataSource={filteredOrders}/>
             <Modal
                 title="Cancel Order"
-                visible={cancelNoteVisible}
+                open={cancelNoteVisible}
                 onOk={confirmCancelOrder}
                 onCancel={() => setCancelNoteVisible(false)}
             >

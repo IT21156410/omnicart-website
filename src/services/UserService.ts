@@ -9,8 +9,8 @@ export class UserService {
         return ApiService.getInstance().getApi();
     }
 
-    public static async getAllUsers(controller?: AbortController, isAdmin = true): Promise<AppResponse<User[]>> {
-        const ep = isAdmin ? ApiUtils.adminUrl('users') : ApiUtils.vendorUrl("users");
+    public static async getAllUsers(controller?: AbortController): Promise<AppResponse<User[]>> {
+        const ep = ApiUtils.csrUrl('users');
         const res = await this.api().get<Partial<User>, AxiosAppResponse<User[]>>(ep, {signal: controller?.signal});
         return res.data;
     }

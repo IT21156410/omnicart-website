@@ -8,6 +8,7 @@ import {Verify2FAPage} from "./auth/Verify2FAPage.tsx";
 import {GuestLayout} from "../layouts/guest/GuestLayout.tsx";
 import {Root} from "../layouts/Root.tsx";
 import UserManagement from "./dashboard/admin/users/Page.tsx";
+import CSRUserManagement from "./dashboard/csr/users/Page.tsx";
 import CreateProduct from "./dashboard/vendor/products/Create.tsx";
 import ManageProducts from "./dashboard/vendor/products/ManageProducts.tsx";
 import UpdateProduct from "./dashboard/vendor/products/Edit.tsx";
@@ -69,6 +70,7 @@ export const router = createBrowserRouter(
                 </Route>
                 <Route path="/csr">
                     <Route path="dashboard" element={<Dashboard/>}/>
+                    <Route path="users" element={<CSRUserManagement/>}/>
                     <Route path="orders" element={<ManageOrdersCSR/>}/>
                     <Route path="cancel-requests" element={<ManageCancelRequests />}/>
                 </Route>

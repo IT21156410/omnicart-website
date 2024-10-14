@@ -101,7 +101,7 @@ class ApiService {
                         break;
                     }
                     default: {
-                        message.error(error.message);
+                        if (error.code !== "ERR_CANCELED") message.error(error.message);
                         console.error(error);
                     }
                 }

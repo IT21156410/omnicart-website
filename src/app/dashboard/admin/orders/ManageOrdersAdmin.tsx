@@ -1,7 +1,7 @@
 import React from "react";
 import ManageOrders from "../../common/orders/ManageOrders.tsx";
 
-const ManageOrdersAdmin: React.FC = ({isAdmin}: { isAdmin?: boolean }) => {
+const ManageOrdersAdmin = ({isAdmin}: { isAdmin?: boolean }) => {
     return (
         <ManageOrders isAdmin={isAdmin}/>
     );

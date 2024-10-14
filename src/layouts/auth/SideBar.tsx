@@ -100,6 +100,12 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
             onClick: () => navigate("/admin/dashboard")
         },
         {
+            key: "/csr/users",
+            icon: <UsergroupAddOutlined/>,
+            label: 'User Management',
+            onClick: () => navigate("/csr/users")
+        },
+        {
             key: 'orders',
             icon: <TruckFilled/>,
             label: 'Order',
