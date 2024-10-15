@@ -15,3 +15,28 @@
     background-color: #000106 !important;
     border: #07203d !important;
 }
+
+/* For WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(121, 132, 139); /* Color of the scrollbar track */
+    border-radius: 10px; /* Round edges */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #07203d; /* Color of the scrollbar handle */
+    border-radius: 10px; /* Round edges */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #07203d; /* Color when hovering over the handle */
+}
+
+/* For Firefox */
+* {
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: #07203d rgb(121, 132, 139); /* scrollbar thumb and track color */
+}
