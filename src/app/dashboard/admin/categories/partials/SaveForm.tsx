@@ -28,6 +28,8 @@ const CategorySaveForm = ({isEditForm, category, onSubmit}: SaveFormProps) => {
 
     const [formData, setFormData] = useState<CreateCategoryData | UpdateCategoryData>(initialData)
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [validationErrors, setValidationErrors] = useState<Partial<Record<"name" | "image", string>>>({})
+
     const navigate = useNavigate();
 
     const onChangeProductStatus = (checked: boolean) => {
@@ -52,8 +54,34 @@ const CategorySaveForm = ({isEditForm, category, onSubmit}: SaveFormProps) => {
         });
     };
 
+    function validateFormData() {
+        setValidationErrors({})
+        let valid = true;
+
+        if (!formData.name || formData.name.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                name: "Category name is required"
+            }))
+            valid = false;
+        }
+        if (fileList.length <= 0 && (!isEditForm || (!formData.image || formData.image.trim() === ""))) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                image: "Category image is required"
+            }))
+            valid = false;
+        }
+        return valid;
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validateFormData()) {
+            console.log(validationErrors)
+            return;
+        }
+
         const oldImage = formData.image;
         // Convert all files to base64
         Promise.all(
@@ -97,10 +125,16 @@ const CategorySaveForm = ({isEditForm, category, onSubmit}: SaveFormProps) => {
                     value={formData.name}
                     onChange={handleInputChange}
                     type="text"
+                    isInvalid={!!validationErrors.name}
                     placeholder="Enter Name"
                 />
+                {validationErrors.name &&
+                    <Form.Text className="text-danger">
+                        <small>{validationErrors.name}</small>
+                    </Form.Text>
+                }
             </FloatingLabel>
-            <Form.Group className="mb-3" controlId="isActive">
+            <Form.Group className="mb-3" controlId="image">
                 <Upload
                     beforeUpload={() => false}
                     listType="picture"
@@ -118,6 +152,11 @@ const CategorySaveForm = ({isEditForm, category, onSubmit}: SaveFormProps) => {
                 >
                     <AntdButton icon={<UploadOutlined/>}>Upload Image</AntdButton>
                 </Upload>
+                {validationErrors.image &&
+                    <Form.Text className="text-danger">
+                        <small>{validationErrors.image}</small>
+                    </Form.Text>
+                }
             </Form.Group>
             <Form.Group className="mb-3" controlId="isActive">
                 <Form.Label className="me-4">Status</Form.Label>

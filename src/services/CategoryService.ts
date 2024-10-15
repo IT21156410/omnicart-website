@@ -10,6 +10,12 @@ export class CategoryService {
     }
 
     public static async all(controller?: AbortController): Promise<AppResponse<Category[]>> {
+        const ep = ApiUtils.adminUrl("categories");
+        const res = await this.api().get<never, AxiosAppResponse<Category[]>>(ep, {signal: controller?.signal});
+        return res.data;
+    }
+
+    public static async allActive(controller?: AbortController): Promise<AppResponse<Category[]>> {
         const ep = ApiUtils.publicUrl("categories");
         const res = await this.api().get<never, AxiosAppResponse<Category[]>>(ep, {signal: controller?.signal});
         return res.data;

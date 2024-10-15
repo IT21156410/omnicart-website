@@ -2,7 +2,7 @@
 
 import React, {ChangeEventHandler, useEffect, useRef, useState} from 'react';
 import {Alert, Button as AntdButton, Card, Divider, GetProp, Image, Upload, UploadFile, UploadProps} from 'antd';
-import {Button, Col, FloatingLabel, Form, Row,} from 'react-bootstrap';
+import {Alert as AlertBootstrap, Button, Col, FloatingLabel, Form, Row,} from 'react-bootstrap';
 import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
 import {CreateProductData, Product, UpdateProductData} from "../../../../../types/models/product.ts";
 
@@ -21,14 +21,13 @@ import {getBase64} from "../../../../../utils/util.ts";
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 
-
 type SaveFormPropsBase<T> = {
     onSubmit: (data: T) => Promise<boolean | undefined>;
 };
 
 type SaveFormProps<T> = SaveFormPropsBase<T> & (
     | { isEditForm: true; product: Product } // Editing form with a preloaded product
-    | { isEditForm?: false; product?: undefined } // Creation form without product
+    | { isEditForm?: false; product?: never } // Creation form without product
     );
 
 const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
@@ -47,7 +46,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
         stock: product?.stock || "",
         sku: product?.sku || "",
         price: product?.price || "",
-        discount: product?.discount || "",
+        discount: product?.discount || 0,
         productWeight: product?.productWeight || "",
         width: product?.width || "",
         height: product?.height || "",
@@ -64,6 +63,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
     const [fileList, setFileList] = useState<UploadFile[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true)
+    const [validationErrors, setValidationErrors] = useState<Partial<Record<keyof T, string>>>({})
 
     const editorRef = useRef(null);
 
@@ -73,7 +73,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
             try {
                 setCategoriesLoading(true);
                 // setCategories([]);
-                const result = await CategoryService.all();
+                const result = await CategoryService.allActive();
                 if (result.success) {
                     setCategories(result.data);
                 }
@@ -121,9 +121,140 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
         });
     };
 
+    function validateFormData() {
+        setValidationErrors({})
+        let valid = true;
+        const errors: Partial<Record<keyof T, string>> = {};
+
+        if (!formData.name || formData.name.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                name: "Product name is required"
+            }))
+            valid = false;
+        }
+
+        if (!formData.categoryId || formData.categoryId.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                categoryId: "Category is required"
+            }))
+            valid = false;
+        }
+
+        if (fileList.length <= 0 && (!isEditForm || (!formData.photos || formData.photos.length <= 0))) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                photos: "At least one photo is required"
+            }))
+            valid = false;
+        }
+
+        if (!formData.condition || formData.condition.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                condition: "Condition is required"
+            }))
+            valid = false;
+        }
+
+        if (!formData.description || formData.description.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                description: "Description is required"
+            }))
+            valid = false;
+        }
+
+        if (!formData.stock || formData.stock <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                stock: "Stock must be greater than zero"
+            }))
+            valid = false;
+        }
+
+        if (!formData.price || formData.price <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                price: "Price must be a positive number"
+            }))
+            valid = false;
+        }
+
+        // Validate SKU (must not be empty)
+        if (!formData.sku || formData.sku.trim() === "") {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                sku: "SKU is required"
+            }));
+            valid = false;
+        }
+
+        // Validate discount (must be between 0 and formData.price)
+        if (formData.discount !== undefined && (formData.discount < 0 || formData.discount > formData.price!)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                discount: `Discount must be between 0 and Product price (${formData.price})`
+            }));
+            valid = false;
+        }
+
+        // Validate product weight (must be greater than 0)
+        if (!formData.productWeight || formData.productWeight <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                productWeight: "Product weight must be greater than zero"
+            }));
+            valid = false;
+        }
+
+        // Validate width (must be greater than 0)
+        if (!formData.width || formData.width <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                width: "Width must be greater than zero"
+            }));
+            valid = false;
+        }
+
+        // Validate height (must be greater than 0)
+        if (!formData.height || formData.height <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                height: "Height must be greater than zero"
+            }));
+            valid = false;
+        }
+
+        // Validate length (must be greater than 0)
+        if (!formData.length || formData.length <= 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                length: "Length must be greater than zero"
+            }));
+            valid = false;
+        }
+
+        // Validate shipping fee (must be greater than or equal to 0)
+        if (formData.shippingFee === undefined || formData.shippingFee < 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                shippingFee: "Shipping fee must be a non-negative number"
+            }));
+            valid = false;
+        }
+        return valid;
+    }
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("clicked");
+        if (!validateFormData()) {
+            console.log(validationErrors)
+            return;
+        }
 
         const photosList: string[] = formData.photos || [];
         // Convert all files to base64
@@ -179,9 +310,15 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                 <Form.Control
                     value={formData.name}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.name}
                     type="text"
                     placeholder="Enter Product Name"
                 />
+                {validationErrors.name &&
+                    <Form.Text className="text-danger">
+                        <small>{validationErrors.name}</small>
+                    </Form.Text>
+                }
             </FloatingLabel>
 
             {/* Product Category */}
@@ -190,6 +327,7 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                     aria-label="Category"
                     value={formData.categoryId}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.categoryId}
                 >
                     <option>Category</option>
                     {categoriesLoading && <option>Loading...</option>}
@@ -198,6 +336,11 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                             <option key={category.id} value={category.id}>{category.name}</option>))
                     }
                 </Form.Select>
+                {validationErrors.categoryId &&
+                    <Form.Text className="text-danger">
+                        <small>{validationErrors.categoryId}</small>
+                    </Form.Text>
+                }
             </FloatingLabel>
 
             <Card title="Product Photos" type="inner" className="mb-3">
@@ -222,6 +365,11 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                     </button>}
                 </Upload>
 
+                {validationErrors.photos &&
+                    <Form.Text className="text-danger">
+                        <small>{validationErrors.photos}</small>
+                    </Form.Text>
+                }
 
                 {previewImage && (
                     <Image
@@ -275,12 +423,18 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                     <Form.Select
                         aria-label="Condition"
                         value={formData.condition}
+                        isInvalid={!!validationErrors.condition}
                         onChange={handleInputChange}
                     >
                         <option value="">Choose condition</option>
                         <option value="New">Brand New</option>
                         <option value="Used">Second Hand</option>
                     </Form.Select>
+                    {validationErrors.condition &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.condition}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
                 <Form.Group className="mb-3">
                     <Form.Label>Product Description</Form.Label>
@@ -293,6 +447,11 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                             ...ckEditorConfig,
                         }}
                     />
+                    {validationErrors.description &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.description}</small>
+                        </Form.Text>
+                    }
                 </Form.Group>
             </Card>
             <Card title="Product Management" type="inner" className="mb-3">
@@ -311,7 +470,13 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         placeholder="Enter Product Stock"
                         value={formData.stock}
                         onChange={handleInputChange}
+                        isInvalid={!!validationErrors.stock}
                     />
+                    {validationErrors.stock &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.stock}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
 
                 {/* SKU */}
@@ -320,8 +485,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         type="text"
                         placeholder="Enter Stock Keeping Unit"
                         value={formData.sku}
+                        isInvalid={!!validationErrors.sku}
                         onChange={handleInputChange}
                     />
+                    {validationErrors.sku &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.sku}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
 
                 {/* Price */}
@@ -330,8 +501,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         type="number"
                         placeholder="Enter Price (LKR)"
                         value={formData.price}
+                        isInvalid={!!validationErrors.price}
                         onChange={handleInputChange}
                     />
+                    {validationErrors.price &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.price}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
 
                 {/* Discount */}
@@ -340,8 +517,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         type="number"
                         placeholder="Enter Discount (LKR)"
                         value={formData.discount}
+                        isInvalid={!!validationErrors.discount}
                         onChange={handleInputChange}
                     />
+                    {validationErrors.discount &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.discount}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
             </Card>
             <Card type="inner" title="Shipping">
@@ -359,7 +542,13 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         placeholder="Enter Product Weight (In Grams)"
                         value={formData.productWeight}
                         onChange={handleInputChange}
+                        isInvalid={!!validationErrors.productWeight}
                     />
+                    {validationErrors.productWeight &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.productWeight}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
 
                 <Form.Group>
@@ -373,8 +562,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                                 type="number"
                                 placeholder="Enter Width"
                                 value={formData.width}
+                                isInvalid={!!validationErrors.width}
                                 onChange={handleInputChange}
                             />
+                            {validationErrors.width &&
+                                <Form.Text className="text-danger">
+                                    <small>{validationErrors.width}</small>
+                                </Form.Text>
+                            }
                         </FloatingLabel>
                     </Col>
                     <Col md>
@@ -383,8 +578,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                                 type="number"
                                 placeholder="Enter Height"
                                 value={formData.height}
+                                isInvalid={!!validationErrors.height}
                                 onChange={handleInputChange}
                             />
+                            {validationErrors.height &&
+                                <Form.Text className="text-danger">
+                                    <small>{validationErrors.height}</small>
+                                </Form.Text>
+                            }
                         </FloatingLabel>
                     </Col>
                     <Col md>
@@ -393,8 +594,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                                 type="number"
                                 placeholder="Enter Length"
                                 value={formData.length}
+                                isInvalid={!!validationErrors.length}
                                 onChange={handleInputChange}
                             />
+                            {validationErrors.length &&
+                                <Form.Text className="text-danger">
+                                    <small>{validationErrors.length}</small>
+                                </Form.Text>
+                            }
                         </FloatingLabel>
                     </Col>
                 </Row>
@@ -405,8 +612,14 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
                         type="number"
                         placeholder="Enter Shipping Fee"
                         value={formData.shippingFee}
+                        isInvalid={!!validationErrors.shippingFee}
                         onChange={handleInputChange}
                     />
+                    {validationErrors.shippingFee &&
+                        <Form.Text className="text-danger">
+                            <small>{validationErrors.shippingFee}</small>
+                        </Form.Text>
+                    }
                 </FloatingLabel>
             </Card>
             <Divider dashed/>
@@ -415,6 +628,17 @@ const ProductSaveForm = <T extends CreateProductData | UpdateProductData>({
             <Button variant="primary" type="submit" className="px-5 py-2">
                 <EditOutlined/> {isEditForm ? 'Update Product' : 'Create Product'}
             </Button>
+
+            {validationErrors && Object.entries(validationErrors).length > 0 && (
+                <AlertBootstrap variant="danger" className="mt-2">
+                    <ul className="mb-0">
+                        {Object.entries(validationErrors).map(([field, error]) => (
+                            <li key={field}>{error}</li>
+                        ))}
+                    </ul>
+                </AlertBootstrap>
+            )}
+
         </Form>
     )
         ;
