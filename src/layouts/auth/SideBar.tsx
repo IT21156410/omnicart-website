@@ -4,7 +4,7 @@ import {
     CodepenOutlined,
     DashboardOutlined,
     DeploymentUnitOutlined,
-    ProductOutlined,
+    ProductOutlined, ProfileFilled, ProfileOutlined,
     TruckFilled,
     UnorderedListOutlined,
     UsergroupAddOutlined
@@ -43,6 +43,10 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
         case "/csr/cancel-requests":
         case "/vendor/orders":
             openSubMenuKeys.push('orders')
+            break;
+        case "/vendor/profile":
+        case "/vendor/ratings":
+            openSubMenuKeys.push('profile')
             break;
         default:
     }
@@ -94,10 +98,10 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
     ]
     const csrRoutes = [
         {
-            key: "/admin/dashboard",
+            key: "/csr/dashboard",
             icon: <DashboardOutlined/>,
             label: 'Dashboard',
-            onClick: () => navigate("/admin/dashboard")
+            onClick: () => navigate("/csr/dashboard")
         },
         {
             key: "/csr/users",
@@ -167,6 +171,25 @@ export const Sidebar = ({collapsed}: { collapsed: boolean }) => {
                     icon: <UnorderedListOutlined/>,
                     label: 'Manage Orders',
                     onClick: () => navigate("/vendor/orders")
+                },
+            ]
+        },
+        {
+            key: 'profile',
+            icon: <ProfileOutlined/>,
+            label: 'Profile',
+            children: [
+                {
+                    key: "/vendor/profile",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Profile',
+                    onClick: () => navigate("/vendor/dashboard")
+                },
+                {
+                    key: "/vendor/ratings",
+                    icon: <UnorderedListOutlined/>,
+                    label: 'Ratings',
+                    onClick: () => navigate("/vendor/ratings")
                 },
             ]
         },

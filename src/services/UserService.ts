@@ -3,6 +3,8 @@ import ApiService from "./api/ApiService.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 import {CreateUserData, UpdateUserData, User} from "../types";
 import {ApiUtils} from "./api/ApiUtils.ts";
+import {Review} from "../types/models/Review.ts";
+import {Role} from "../enums/auth.ts";
 
 export class UserService {
     private static api(): ApiInstance {
@@ -43,6 +45,12 @@ export class UserService {
 
         const ep = ApiUtils.adminUrl(`users/${userId}`);
         const res = await this.api().delete<UpdateUserData, AxiosAppResponse<User>>(ep);
+        return res.data;
+    }
+
+    public static async getAllVendorReviews(role: Role, vendorId: string, controller?: AbortController): Promise<AppResponse<Review[]>> {
+        const ep = ApiUtils.publicUrl(`review/vendor/${vendorId}`);
+        const res = await this.api().get<any, AxiosAppResponse<Review[]>>(ep, {signal: controller?.signal});
         return res.data;
     }
 }

@@ -23,6 +23,7 @@ import ManageOrdersVendor from "./dashboard/vendor/orders/ManageOrdersVendor.tsx
 import ManageOrdersCSR from "./dashboard/csr/orders/ManageOrdersCSR.tsx";
 import ManageOrdersAdmin from "./dashboard/admin/orders/ManageOrdersAdmin.tsx";
 import ManageCancelRequests from "./dashboard/common/orders/ManageCancelRequests.tsx";
+import ManageRatings from "./dashboard/vendor/profile/ManageRatings.tsx";
 
 const getUserData = () =>
     new Promise((resolve) => {
@@ -67,6 +68,7 @@ export const router = createBrowserRouter(
                     <Route path="products/create" element={<CreateProduct/>}/>
                     <Route path="products/:id/edit" element={<UpdateProduct/>}/>
                     <Route path="orders" element={<ManageOrdersVendor/>}/>
+                    <Route path="ratings" element={<ManageRatings/>}/>
                 </Route>
                 <Route path="/csr">
                     <Route path="dashboard" element={<Dashboard/>}/>
