@@ -24,6 +24,7 @@ export default tseslint.config(
             ],
             "@typescript-eslint/no-explicit-any": ["warn"],
             "no-useless-catch": ["warn"],
+            "no-empty": ["warn"],
             'react-refresh/only-export-components': [
                 'warn',
                 {allowConstantExport: true},
