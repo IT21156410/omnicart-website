@@ -385,16 +385,17 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                                         value={selectedCategory}
                                         onChange={(value) => setSelectedCategory(value)}
                                     >
-                                        <option value="">All Categories</option>
+                                        <Select.Option value="">All Categories</Select.Option>
                                         {/* Add your category options here */}
                                         {
                                             Array.from(new Set(products.map(product => product.categoryId)))
                                                 .map(categoryId => (
-                                                    <option
+                                                    <Select.Option
+                                                        key={categoryId}
                                                         value={categoryId}
                                                     >
                                                         {products.find(p => p.categoryId === categoryId)?.category?.name}
-                                                    </option>)
+                                                    </Select.Option>)
                                                 )
                                         }
                                     </Select>
@@ -404,11 +405,11 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                                         value={selectedStatus}
                                         onChange={(value, option) => setSelectedStatus(value)}
                                     >
-                                        <option value="">All Statuses</option>
-                                        <option value={ProductStatus.Pending}>Pending</option>
-                                        <option value={ProductStatus.Active}>Active</option>
-                                        <option value={ProductStatus.Inactive}>Inactive</option>
-                                        <option value={ProductStatus.Rejected}>Rejected</option>
+                                        <Select.Option value="">All Statuses</Select.Option>
+                                        <Select.Option value={ProductStatus.Pending}>Pending</Select.Option>
+                                        <Select.Option value={ProductStatus.Active}>Active</Select.Option>
+                                        <Select.Option value={ProductStatus.Inactive}>Inactive</Select.Option>
+                                        <Select.Option value={ProductStatus.Rejected}>Rejected</Select.Option>
                                     </Select>
                                 </Form.Item>
                             </Form>
