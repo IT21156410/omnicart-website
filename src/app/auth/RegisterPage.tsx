@@ -6,6 +6,7 @@ import {UserSignUpData} from "../../types/http-service/auth";
 import {useNotification} from "../../hooks/useNotification.tsx";
 import {trimText} from "../../utils/util.ts";
 import {Image} from "antd";
+import {EyeInvisibleOutlined, EyeOutlined} from "@ant-design/icons";
 
 export const RegisterPage = () => {
 
@@ -33,6 +34,8 @@ export const RegisterPage = () => {
     const [errors, setErrors] = useState<any>(null);
     const [isDisable, setIsDisable] = useState<boolean>(false);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     if (user && !is2FAVerified) {
         return <Navigate to="/verify-2fa"/>;
@@ -213,26 +216,52 @@ export const RegisterPage = () => {
                                 </Form.Group>
                                 <Form.Group id="password" className="mb-3">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        name="password"
-                                        value={userSignUpData.password}
-                                        onChange={passwordChange}
-                                        placeholder="Enter your password"
-                                    />
+                                    <div className="d-flex align-items-center position-relative">
+                                        <Form.Control
+                                            type={showPassword ? "text" : "password"}
+                                            name="password"
+                                            value={userSignUpData.password}
+                                            onChange={passwordChange}
+                                            placeholder="Enter your password"
+                                        />
+                                        <span
+                                            className="position-absolute end-0 me-3"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            style={{cursor: "pointer"}}
+                                        >
+                                            {showPassword ? (
+                                                <EyeInvisibleOutlined/>
+                                            ) : (
+                                                <EyeOutlined/>
+                                            )}
+                                        </span>
+                                    </div>
                                     <Form.Text className="text-danger">
                                         <small>{passwordErrMsg}</small>
                                     </Form.Text>
                                 </Form.Group>
                                 <Form.Group id="passwordConfirmation" className="mb-3">
                                     <Form.Label>Confirm Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        name="passwordConfirmation"
-                                        value={userSignUpData.passwordConfirmation}
-                                        onChange={passwordConfirmChange}
-                                        placeholder="Confirm your password"
-                                    />
+                                    <div className="d-flex align-items-center position-relative">
+                                        <Form.Control
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            name="passwordConfirmation"
+                                            value={userSignUpData.passwordConfirmation}
+                                            onChange={passwordConfirmChange}
+                                            placeholder="Confirm your password"
+                                        />
+                                        <span
+                                            className="position-absolute end-0 me-3"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            style={{cursor: "pointer"}}
+                                        >
+                                            {showConfirmPassword ? (
+                                                <EyeInvisibleOutlined/>
+                                            ) : (
+                                                <EyeOutlined/>
+                                            )}
+                                        </span>
+                                    </div>
                                     <Form.Text className="text-danger">
                                         <small>{passwordConfirmErrMsg}</small>
                                     </Form.Text>

@@ -8,6 +8,7 @@ import Newsletter from '../../components/landing-components/Newsletter';
 import Footer from '../../components/landing-components/Footer';
 
 import BlackFriDay from "../../assets/img/black-friday.svg";
+import {Image} from "antd";
 
 export default function Home() {
 
@@ -25,7 +26,7 @@ export default function Home() {
             <section className="my-5 text-center">
                 <div className="bloco-post d-flex align-items-center justify-content-center flex-wrap">
                     <div className="post1 p-3">
-                        <img
+                        <Image
                             src={BlackFriDay || "https://via.placeholder.com/300x150"}
                             alt="Black Friday Banner"
                             width={300}

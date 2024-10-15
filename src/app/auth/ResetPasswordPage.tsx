@@ -6,6 +6,7 @@ import {trimText} from "../../utils/util.ts";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {ResetPswData} from "../../types/http-service/auth";
 import {Image} from "antd";
+import {EyeInvisibleOutlined, EyeOutlined} from "@ant-design/icons";
 
 export const ResetPasswordPage = () => {
 
@@ -27,6 +28,7 @@ export const ResetPasswordPage = () => {
     const [emailErrMsg, setEmailErrMsg] = useState<string>("");
     const [errors, setErrors] = useState<any>(null);
     const [isDisable, setIsDisable] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (!token) {
@@ -131,13 +133,26 @@ export const ResetPasswordPage = () => {
                                 )}
                                 <Form.Group id="newPassword" className="mb-3">
                                     <Form.Label>New Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        name="newPassword"
-                                        value={resetPswData.newPassword}
-                                        onChange={newPasswordChange}
-                                        placeholder="Enter your new password"
-                                    />
+                                    <div className="d-flex align-items-center position-relative">
+                                        <Form.Control
+                                            type={showPassword ? "text" : "password"}
+                                            name="newPassword"
+                                            value={resetPswData.newPassword}
+                                            onChange={newPasswordChange}
+                                            placeholder="Enter your new password"
+                                        />
+                                        <span
+                                            className="position-absolute end-0 me-3"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            style={{cursor: "pointer"}}
+                                        >
+                                            {showPassword ? (
+                                                <EyeInvisibleOutlined/>
+                                            ) : (
+                                                <EyeOutlined/>
+                                            )}
+                                        </span>
+                                    </div>
                                     <Form.Text className="text-danger">
                                         <small>{passwordErrMsg}</small>
                                     </Form.Text>
