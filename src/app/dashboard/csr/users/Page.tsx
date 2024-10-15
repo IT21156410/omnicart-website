@@ -21,7 +21,7 @@ const UserManagement = () => {
     // Filter states
     const [searchName, setSearchName] = useState('');
     const [searchEmail, setSearchEmail] = useState('');
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = useState<Role | "">("");
     const [isActive, setIsActive] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -135,13 +135,13 @@ const UserManagement = () => {
                                 </Form.Item>
 
                                 <Form.Item>
-                                    <Select<Role | null>
+                                    <Select<Role | "">
                                         placeholder="Select Role"
                                         value={selectedRole}
                                         onChange={(value) => setSelectedRole(value)}
                                         style={{width: '200px'}}
                                     >
-                                        <Select.Option value={null}>All Roles</Select.Option>
+                                        <Select.Option value="">All Roles</Select.Option>
                                         <Select.Option value={Role.admin}>Admin</Select.Option>
                                         <Select.Option value={Role.vendor}>Vendor</Select.Option>
                                         <Select.Option value={Role.csr}>CSR</Select.Option>
