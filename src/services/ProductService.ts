@@ -3,6 +3,7 @@ import ApiService from "./api/ApiService.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 import {CreateProductData, Product, ProductStatus, UpdateProductData} from "../types/models/product";
 import {ApiUtils} from "./api/ApiUtils.ts";
+import {Role} from "../enums/auth.ts";
 
 export class ProductService {
     // Get API instance
@@ -24,8 +25,8 @@ export class ProductService {
     }
 
     // Get a product by ID
-    public static async getProductById(productId: string): Promise<AppResponse<Product>> {
-        const ep = ApiUtils.vendorUrl(`products/${productId}`);
+    public static async getProductById(role: Role, productId: string): Promise<AppResponse<Product>> {
+        let ep = ApiUtils.epByRole(role, `products/${productId}`);
         const res = await this.api().get<Partial<Product>, AxiosAppResponse<Product>>(ep);
         return res.data;
     }
