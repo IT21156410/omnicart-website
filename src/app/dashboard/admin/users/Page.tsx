@@ -2,11 +2,25 @@ import React, {useEffect, useState} from 'react';
 import {Accordion, Button, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card, Checkbox, Form, Input, message, notification, Popconfirm, Select, Switch, Tag, Tooltip} from 'antd';
+import {
+    Button as AntdButton,
+    Card,
+    Checkbox,
+    Form,
+    Input,
+    message,
+    notification,
+    Popconfirm,
+    Select,
+    Switch,
+    Tag,
+    Tooltip
+} from 'antd';
 import SaveModal from "./Patials/SaveModal.tsx";
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
 import {Role} from "../../../../enums/auth.ts";
+import {generatePDF} from "../../common/users/generatePdf.ts";
 
 const UserManagement = () => {
 
@@ -220,6 +234,13 @@ const UserManagement = () => {
             setLoading(false);
         }
     };
+
+
+    const handleGenerateReport = () => {
+        generatePDF(users);
+    };
+
+
     return (
         <Card
             loading={loading}
@@ -288,6 +309,9 @@ const UserManagement = () => {
                 </Accordion.Item>
             </Accordion>
 
+            <AntdButton className="mb-2" type="primary" onClick={handleGenerateReport}>
+                Generate PDF Report
+            </AntdButton>
             {/* User Table */}
             <Table striped bordered hover>
                 <thead>

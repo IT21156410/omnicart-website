@@ -19,6 +19,8 @@
     "bootstrap-icons": "^1.11.3",
     "bowser": "^2.11.0",
     "ckeditor5": "^43.1.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
     "react-dom": "^18.3.1",

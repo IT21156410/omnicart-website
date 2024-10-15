@@ -2,11 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {Accordion, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card, Checkbox, Form, Input, message, notification, Select, Switch, Tag, Tooltip} from 'antd';
+import {Button, Card, Checkbox, Form, Input, message, notification, Select, Switch, Tag, Tooltip} from 'antd';
 
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
 import {Role} from "../../../../enums/auth.ts";
+import {generatePDF} from "../../common/users/generatePdf.ts";
 
 const UserManagement = () => {
     const [api, contextHolder] = notification.useNotification();
@@ -100,6 +101,11 @@ const UserManagement = () => {
         }
     };
 
+
+    const handleGenerateReport = () => {
+        generatePDF(users);
+    };
+
     return (
         <Card
             loading={loading}
@@ -164,6 +170,10 @@ const UserManagement = () => {
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
+
+            <Button className="mb-2" type="primary" onClick={handleGenerateReport}>
+                Generate PDF Report
+            </Button>
 
             {/* User Table */}
             <Table striped bordered hover>
