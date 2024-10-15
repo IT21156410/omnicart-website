@@ -298,7 +298,7 @@ export const RegisterPage = () => {
                                 )}
                                 <Button
                                     disabled={isDisable}
-                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"} app-dark-btn`}
                                     variant="dark"
                                     type="submit"
                                 >

@@ -5,3 +5,13 @@
 .ant-layout-sider-collapsed .logo {
     display: none;
 }
+
+.app-dark-btn {
+    background-color: #07203d !important;
+    border: #000106 !important;
+}
+
+.app-dark-btn:hover {
+    background-color: #000106 !important;
+    border: #07203d !important;
+}

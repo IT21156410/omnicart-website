@@ -24,6 +24,11 @@ import ManageOrdersCSR from "./dashboard/csr/orders/ManageOrdersCSR.tsx";
 import ManageOrdersAdmin from "./dashboard/admin/orders/ManageOrdersAdmin.tsx";
 import ManageCancelRequests from "./dashboard/common/orders/ManageCancelRequests.tsx";
 import ManageRatings from "./dashboard/vendor/profile/ManageRatings.tsx";
+import Products from "./landing/Products.tsx";
+import Promotions from "./landing/Promotions.tsx";
+import About from "./landing/About.tsx";
+import Contact from "./landing/Contact.tsx";
+import FAQ from "./landing/FAQ.tsx";
 
 const getUserData = () =>
     new Promise((resolve) => {
@@ -39,6 +44,12 @@ export const router = createBrowserRouter(
             loader={() => defer({userPromise: getUserData()})}
         >
             <Route path="/" element={<Home/>}/>
+            <Route path="/products" element={<Products />} />
+            <Route path="/promotions" element={<Promotions />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+
             <Route element={<GuestLayout/>}>
                 <Route path="/verify-2fa" element={<Verify2FAPage/>}/>
                 <Route path="/login" element={<LoginPage/>}/>

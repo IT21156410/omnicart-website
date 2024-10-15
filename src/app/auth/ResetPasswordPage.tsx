@@ -159,7 +159,7 @@ export const ResetPasswordPage = () => {
                                 </Form.Group>
                                 <Button
                                     type="submit"
-                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"}`}
+                                    className={`mt-3 w-100 ${isDisable && "pointer-events-none"} app-dark-btn`}
                                     variant="dark"
                                     disabled={isDisable}
                                 >
