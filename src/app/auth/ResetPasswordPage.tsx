@@ -68,7 +68,7 @@ export const ResetPasswordPage = () => {
             try {
                 setIsDisable(true);
                 const res = await resetPassword(resetPswData);
-                addNotification(res.message, "success", "Success");
+                addNotification(res!.message, "success", "Success");
                 navigate("/login");
             } catch (error) {
                 if (error.response?.status >= 500) {

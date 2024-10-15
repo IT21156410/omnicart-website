@@ -54,7 +54,7 @@ export const ForgotPasswordPage = () => {
             try {
                 setIsDisable(true);
                 const res = await forgotPassword(forgotPswData);
-                addNotification(res.message, "success", "Success");
+                addNotification(res!.message, "success", "Success");
                 setIsSuccess(true);
             } catch (error) {
                 setIsDisable(false);

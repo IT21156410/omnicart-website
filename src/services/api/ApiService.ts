@@ -90,7 +90,10 @@ class ApiService {
                         message.error('You are not allowed to perform this action! Forbidden.');
                         break;
                     case 401:
-                        message.error('You are not allowed to perform this action! Unauthorized.');
+                        const pathsToCheck = ['login', 'register', 'forgot-password', 'reset-password'];
+                        if (!pathsToCheck.some(path => window.location.pathname.includes(path))) {
+                            message.error('You are not allowed to perform this action! Unauthorized.');
+                        }
                         break;
                     case 400:
                         message.error('Bad Request');
