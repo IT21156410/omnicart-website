@@ -21,6 +21,8 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
     const [statusChanging, setStatusChanging] = useState<boolean>(false);
     const [cancelNoteVisible, setCancelNoteVisible] = useState<boolean>(false);
     const [cancelNote, setCancelNote] = useState<string>('');
+    const [cancelOrderErrorVisible, setCancelOrderErrorVisible] = useState<boolean>(false);
+    const [cancelOrderError, setCancelOrderError] = useState<string | null>(null);
     const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
     const [axiosController, setAxiosController] = useState(new AbortController());
     const [error, setError] = useState<string | null>(null);
@@ -72,15 +74,21 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
     }, [axiosController]);
 
     const showProductModal = async (productId: string) => {
-        try {
-            setProductLoading(true);
-            const response = await ProductService.getProductById(role, productId!);
-            if (response.success && response.data) {
-                setSelectedProduct(response.data);
+        if (productId !== selectedProduct?.id) {
+            try {
+                setProductLoading(true);
+                const response = await ProductService.getProductById(role, productId!);
+                if (response.success && response.data) {
+                    setSelectedProduct(response.data);
+                }
+            } catch (err) {
+                setSelectedProduct(null);
+                setError('Failed to load product.');
+            } finally {
+                setProductLoading(false);
+                setIsProductModalVisible(true);
             }
-        } catch (err) {
-            setError('Failed to load product.');
-        } finally {
+        } else {
             setProductLoading(false);
             setIsProductModalVisible(true);
         }
@@ -295,6 +303,10 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
             if (e?.response?.data?.message) {
                 error = e?.response?.data?.message;
             }
+            if (error === "Cancellation request not found" && role === Role.csr) {
+                setCancelOrderError("Without customer's request, you cannot cancel the order!");
+                setCancelOrderErrorVisible(true);
+            }
             message.error(error);
         } finally {
             setCancelNoteVisible(false);
@@ -331,6 +343,7 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                 />
             </div>
             <Table<Order> rowKey="id" columns={columns} dataSource={filteredOrders}/>
+
             <Modal
                 title="Cancel Order"
                 open={cancelNoteVisible}
@@ -344,6 +357,15 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                     onChange={e => setCancelNote(e.target.value)}
                     required
                 />
+            </Modal>
+
+            <Modal
+                title="Cancel Order"
+                open={cancelOrderErrorVisible}
+                onCancel={() => setCancelOrderErrorVisible(false)}
+                footer={null}
+            >
+                <p className="text-danger">{cancelOrderError}</p>
             </Modal>
 
             <Modal
