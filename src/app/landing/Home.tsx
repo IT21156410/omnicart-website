@@ -1,12 +1,13 @@
 import React from 'react';
-import { Button, Container, Nav, Navbar } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
-
 import Menu from '../../components/landing-components/Menu';
 import Slider from '../../components/landing-components/Slider';
 import TypeProducts from '../../components/landing-components/TypeProducts';
 import Newsletter from '../../components/landing-components/Newsletter';
 import Footer from '../../components/landing-components/Footer';
+
+import BlackFriDay from "../../assets/img/black-friday.svg";
 
 export default function Home() {
 
@@ -25,7 +26,7 @@ export default function Home() {
                 <div className="bloco-post d-flex align-items-center justify-content-center flex-wrap">
                     <div className="post1 p-3">
                         <img
-                            src="https://via.placeholder.com/300x150"
+                            src={BlackFriDay || "https://via.placeholder.com/300x150"}
                             alt="Black Friday Banner"
                             width={300}
                             height={150}
@@ -35,7 +36,7 @@ export default function Home() {
                     <div className="post2 text-center p-3">
                         <h4>Exclusive Black Friday Deals</h4>
                         <p>Redecorate and refresh your home with our special offers!</p>
-                        <Button variant="dark" size="lg" onClick={() => navigate('/shop')}>
+                        <Button variant="dark" size="lg" onClick={() => navigate('#')}>
                             Shop Now
                         </Button>
                     </div>

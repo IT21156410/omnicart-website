@@ -5,6 +5,7 @@ import ModalContact from './ModalContact';
 import {Link, useNavigate} from "react-router-dom";
 
 export default function Menu() {
+
   const navigate = useNavigate();
   const [modalShow, setModalShow] = React.useState(false);
   const { user, token, logout } = useAuth();
@@ -17,7 +18,7 @@ export default function Menu() {
       <Navbar style={{ backgroundColor: '#f8f9fa' }} expand="md" width="100%">
         <Container>
           <Navbar.Brand href="/">
-            <img id="logo" src={"/omni-cart.webp"} alt="OminiCart Logo" width={100} height={100} />
+            <img id="logo" src={"/omnicart-logo-txt.webp"} alt="OminiCart Logo" width={200} height="auto" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className='text-center justify-content-end'>

@@ -107,7 +107,7 @@ export const LoginPage = () => {
                         <Card.Body>
                             <div className="d-flex justify-content-center align-items-center">
                                 <Image
-                                    src={"/omni-cart.webp"}
+                                    src={"/omnicart-logo.webp"}
                                     style={{maxWidth: '140px', height: 'auto', cursor: 'pointer'}}
                                     preview={false}
                                     onClick={() => navigate("/")}

@@ -8,7 +8,7 @@ export default function Footer() {
                 <Col>
                     <a href="/">
                         <img
-                            src={"/omni-cart.webp"}
+                            src={"/omnicart-logo.webp"}
                             alt="logotipo da Beautiful Home Store"
                             width={150}
                         />
