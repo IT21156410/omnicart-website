@@ -8,6 +8,9 @@ import {useAuth} from "../../../../hooks/useAuth.tsx";
 import {Role} from "../../../../enums/auth.ts";
 import {Product} from "../../../../types/models/product.ts";
 import {ProductService} from "../../../../services/ProductService.ts";
+import JsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import {getCurrentDateTime} from "../../../../utils/date-time.ts";
 
 const {TextArea} = Input;
 
@@ -318,6 +321,10 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
         setSearchText(e.target.value);
     };
 
+    const handleGenerateReport = () => {
+        generatePDF(orders);
+    };
+
     return (
         <Card loading={loading} title="Manage Orders">
             <div className="d-flex justify-content-between mb-3">
@@ -327,20 +334,25 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
                     onChange={handleSearch}
                     style={{width: 200}}
                 />
-                <Select<OrderStatus>
-                    style={{width: 200}}
-                    placeholder="Filter by status"
-                    onChange={setStatusFilter}
-                    allowClear
-                    options={[
-                        {value: OrderStatus.Pending, label: 'Pending'},
-                        {value: OrderStatus.Processing, label: 'Processing'},
-                        {value: OrderStatus.Shipped, label: 'Shipped'},
-                        {value: OrderStatus.PartiallyDelivered, label: 'Partially Delivered'},
-                        {value: OrderStatus.Delivered, label: 'Delivered'},
-                        {value: OrderStatus.Cancelled, label: 'Cancelled'},
-                    ]}
-                />
+                <div>
+                    <Select<OrderStatus>
+                        style={{width: 200}}
+                        placeholder="Filter by status"
+                        onChange={setStatusFilter}
+                        allowClear
+                        options={[
+                            {value: OrderStatus.Pending, label: 'Pending'},
+                            {value: OrderStatus.Processing, label: 'Processing'},
+                            {value: OrderStatus.Shipped, label: 'Shipped'},
+                            {value: OrderStatus.PartiallyDelivered, label: 'Partially Delivered'},
+                            {value: OrderStatus.Delivered, label: 'Delivered'},
+                            {value: OrderStatus.Cancelled, label: 'Cancelled'},
+                        ]}
+                    />
+                    <Button className="mb-2 ms-4" type="primary" onClick={handleGenerateReport}>
+                        Generate PDF Report
+                    </Button>
+                </div>
             </div>
             <Table<Order> rowKey="id" columns={columns} dataSource={filteredOrders}/>
 
@@ -418,6 +430,37 @@ const ManageOrders = ({isAdmin}: { isAdmin?: boolean }) => {
 
         </Card>
     );
+};
+
+const generatePDF = (orders: Order[]) => {
+    const doc = new JsPDF({orientation: "landscape"});
+
+    // Title of the document
+    doc.setFontSize(18);
+    doc.text('Orders Report', 14, 22);
+
+    // Create the table
+    const tableData = orders.map((order) => {
+        const itemsList = order.items.map(item => `${item.productId} (Status: ${item.status})`).join(', ');
+        return [
+            order.orderNumber,
+            order.status,
+            order.totalAmount,
+            order.shippingFee,
+            order.orderDate,
+            order.note || '-',
+            itemsList
+        ];
+    });
+
+    autoTable(doc, {
+        head: [['Order Number', 'Status', 'Total Amount', 'Shipping Fee', 'Order Date', 'Note', 'Items (with Status)']],
+        body: tableData,
+        startY: 30,
+    });
+
+    // Save the PDF
+    doc.save(`orders_report-${getCurrentDateTime()}.pdf`);
 };
 
 export default ManageOrders;
