@@ -121,7 +121,7 @@ const ManageCancelRequests = ({isAdmin}: { isAdmin?: boolean }) => {
     const handleProcessRequest = async (request: CancelRequest, isApproved: boolean) => {
         try {
             setProcessingRequest(true);
-            const result = await CancelRequestService.processCancelRequest(role, request.id, isApproved);
+            const result = await CancelRequestService.processCancelRequest(role, request, isApproved);
             if (result.success) {
                 message.success(result.message);
                 setCancelRequests(prevRequests =>

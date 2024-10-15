@@ -21,9 +21,12 @@ export class CancelRequestService {
         return res.data;
     }
 
-    public static async processCancelRequest(role: Role, requestId: string, isApproved: any): Promise<AppResponse<CancelRequest[]>> {
-        let ep = ApiUtils.epByRole(role, `orders/cancel/${requestId}/process`);
-        const res = await this.api().post<{ isApproved: boolean }, AxiosAppResponse<CancelRequest[]>>(ep, {isApproved: isApproved} );
+    public static async processCancelRequest(role: Role, request: CancelRequest, isApproved: any): Promise<AppResponse<CancelRequest[]>> {
+        let ep = ApiUtils.epByRole(role, `orders/cancel/${request.id}/process`);
+        const res = await this.api().post<{
+            isApproved: boolean,
+            orderId: CancelRequest
+        }, AxiosAppResponse<CancelRequest[]>>(ep, {isApproved: isApproved, request: request});
         return res.data;
     }
 }

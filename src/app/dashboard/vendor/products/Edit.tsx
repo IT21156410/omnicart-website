@@ -7,6 +7,7 @@ import ProductSaveForm from "./Partials/SaveForm.tsx";
 import {ProductService} from "../../../../services/ProductService.ts";
 import {Product, UpdateProductData} from "../../../../types/models/product.ts";
 import {useParams} from "react-router-dom";
+import {Role} from "../../../../enums/auth.ts";
 
 const UpdateProduct = () => {
     const {id} = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ const UpdateProduct = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await ProductService.getProductById(id!);  // Fetch the product using id
+                const response = await ProductService.getProductById(Role.vendor, id!);  // Fetch the product using id
                 setProduct(response.data);  // Set the fetched product
             } catch (err) {
                 setError('Failed to load product.');
