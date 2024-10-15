@@ -4,6 +4,7 @@ import {ApiUtils} from "./api/ApiUtils.ts";
 import {AppResponse, AxiosAppResponse} from "../types/http-service/response";
 import {Role} from "../enums/auth.ts";
 import {CancelRequest} from "../types/models/CancelRequest.ts";
+import {Order} from "../types/models/Order.ts";
 
 export class CancelRequestService {
 
@@ -29,4 +30,11 @@ export class CancelRequestService {
         }, AxiosAppResponse<CancelRequest[]>>(ep, {isApproved: isApproved, request: request});
         return res.data;
     }
+
+    public static async createCancelRequest(orderId: string, reason: string): Promise<AppResponse<any>> {
+        let ep = ApiUtils.authUrl(`orders/${orderId}/cancel-request`);
+        const res = await this.api().post<{ reason: string }, AxiosAppResponse<any>>(ep, {reason: reason});
+        return res.data;
+    }
+
 }
