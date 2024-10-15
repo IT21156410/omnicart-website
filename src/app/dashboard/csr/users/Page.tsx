@@ -2,11 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {Accordion, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card, Checkbox, Form, Input, message, notification, Select, Switch, Tag, Tooltip} from 'antd';
+import {Button, Card, Checkbox, Form, Input, message, notification, Select, Switch, Tag, Tooltip} from 'antd';
 
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
 import {Role} from "../../../../enums/auth.ts";
+import {generatePDF} from "../../common/users/generatePdf.ts";
 
 const UserManagement = () => {
     const [api, contextHolder] = notification.useNotification();
@@ -20,7 +21,7 @@ const UserManagement = () => {
     // Filter states
     const [searchName, setSearchName] = useState('');
     const [searchEmail, setSearchEmail] = useState('');
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = useState<Role | "">("");
     const [isActive, setIsActive] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -100,6 +101,11 @@ const UserManagement = () => {
         }
     };
 
+
+    const handleGenerateReport = () => {
+        generatePDF(users);
+    };
+
     return (
         <Card
             loading={loading}
@@ -129,13 +135,13 @@ const UserManagement = () => {
                                 </Form.Item>
 
                                 <Form.Item>
-                                    <Select<Role | null>
+                                    <Select<Role | "">
                                         placeholder="Select Role"
                                         value={selectedRole}
                                         onChange={(value) => setSelectedRole(value)}
                                         style={{width: '200px'}}
                                     >
-                                        <Select.Option value={null}>All Roles</Select.Option>
+                                        <Select.Option value="">All Roles</Select.Option>
                                         <Select.Option value={Role.admin}>Admin</Select.Option>
                                         <Select.Option value={Role.vendor}>Vendor</Select.Option>
                                         <Select.Option value={Role.csr}>CSR</Select.Option>
@@ -164,6 +170,10 @@ const UserManagement = () => {
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
+
+            <Button className="mb-2" type="primary" onClick={handleGenerateReport}>
+                Generate PDF Report
+            </Button>
 
             {/* User Table */}
             <Table striped bordered hover>

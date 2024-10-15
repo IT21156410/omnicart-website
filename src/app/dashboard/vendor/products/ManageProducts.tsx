@@ -23,7 +23,39 @@ import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import {useAuth} from "../../../../hooks/useAuth.tsx";
 import {Role} from "../../../../enums/auth.ts";
 import {Accordion, InputGroup} from 'react-bootstrap';
+import JsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import {getCurrentDateTime} from "../../../../utils/date-time.ts";
 
+const generatePDF = (products: Product[]) => {
+    const doc = new JsPDF({orientation: "landscape",});
+
+    // Title of the document
+    doc.setFontSize(18);
+    doc.text('Product Report', 14, 22);
+
+    // Create the table
+    const tableData = products.map((product) => [
+        product.name,
+        product.status,
+        product.category?.name ?? "-", // Assuming category object has a name
+        product.condition,
+        product.stock.toString(),
+        product.sku,
+        product.price.toString(),
+        product.discount.toString(),
+        product.shippingFee.toString(),
+    ]);
+
+    autoTable(doc, {
+        head: [['Product Name', 'Status', 'Category', 'Condition', 'Stock', 'SKU', 'Price', 'Discount', 'Shipping']],
+        body: tableData,
+        startY: 30,
+    });
+
+    // Save the PDF
+    doc.save(`product_report-${getCurrentDateTime()}.pdf`);
+};
 
 const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean, filterOutOfStock?: boolean }) => {
     const {user} = useAuth();
@@ -309,6 +341,11 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
         });
 
     };
+
+    const handleGenerateReport = () => {
+        generatePDF(products);
+    };
+
     return (
         <Card loading={loading} title="Manage Products">
             {/* Filter Inputs */}
@@ -348,16 +385,17 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                                         value={selectedCategory}
                                         onChange={(value) => setSelectedCategory(value)}
                                     >
-                                        <option value="">All Categories</option>
+                                        <Select.Option value="">All Categories</Select.Option>
                                         {/* Add your category options here */}
                                         {
                                             Array.from(new Set(products.map(product => product.categoryId)))
                                                 .map(categoryId => (
-                                                    <option
+                                                    <Select.Option
+                                                        key={categoryId}
                                                         value={categoryId}
                                                     >
                                                         {products.find(p => p.categoryId === categoryId)?.category?.name}
-                                                    </option>)
+                                                    </Select.Option>)
                                                 )
                                         }
                                     </Select>
@@ -367,11 +405,11 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                                         value={selectedStatus}
                                         onChange={(value, option) => setSelectedStatus(value)}
                                     >
-                                        <option value="">All Statuses</option>
-                                        <option value={ProductStatus.Pending}>Pending</option>
-                                        <option value={ProductStatus.Active}>Active</option>
-                                        <option value={ProductStatus.Inactive}>Inactive</option>
-                                        <option value={ProductStatus.Rejected}>Rejected</option>
+                                        <Select.Option value="">All Statuses</Select.Option>
+                                        <Select.Option value={ProductStatus.Pending}>Pending</Select.Option>
+                                        <Select.Option value={ProductStatus.Active}>Active</Select.Option>
+                                        <Select.Option value={ProductStatus.Inactive}>Inactive</Select.Option>
+                                        <Select.Option value={ProductStatus.Rejected}>Rejected</Select.Option>
                                     </Select>
                                 </Form.Item>
                             </Form>
@@ -381,6 +419,10 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
+
+            <Button className="mb-2" type="primary" onClick={handleGenerateReport}>
+                Generate PDF Report
+            </Button>
             <Table<Product> rowKey="id" columns={columns} dataSource={filteredProducts}/>
             {
                 selectedProduct &&

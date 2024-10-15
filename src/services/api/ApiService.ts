@@ -79,6 +79,9 @@ class ApiService {
                 return response;
             },
             (error: AxiosError<any>) => {
+                message.config({
+                    maxCount: 1,
+                });
                 switch (error.response?.status) {
                     case 0:
                         message.warning('Error, Please check logs.');
@@ -89,18 +92,19 @@ class ApiService {
                     case 403:
                         message.error('You are not allowed to perform this action! Forbidden.');
                         break;
-                    case 401:
+                    case 401: {
                         const pathsToCheck = ['login', 'register', 'forgot-password', 'reset-password', 'verify-2fa'];
                         if (!pathsToCheck.some(path => window.location.pathname.includes(path))) {
                             message.error('You are not allowed to perform this action! Unauthorized.');
                         }
                         break;
+                    }
                     case 400:
                         message.error('Bad Request');
                         break;
                     case 422: {
-                        const message = 'message' in error.response?.data ? error.response?.data.message : error.response?.data;
-                        message.error(message);
+                        const messageText = 'message' in error.response?.data ? error.response?.data.message : error.response?.data;
+                        message.error(messageText);
                         break;
                     }
                     default: {
