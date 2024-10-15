@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Accordion, Dropdown, FormControl, InputGroup, Table} from 'react-bootstrap';
+import {Accordion, InputGroup, Table} from 'react-bootstrap';
 
 import {User} from "../../../../types";
-import {Card, message, notification, Switch, Tag, Tooltip} from 'antd';
+import {Card, Checkbox, Form, Input, message, notification, Select, Switch, Tag, Tooltip} from 'antd';
 
 import {UserService} from "../../../../services/UserService.ts";
 import axios from "axios";
+import {Role} from "../../../../enums/auth.ts";
 
 const UserManagement = () => {
     const [api, contextHolder] = notification.useNotification();
@@ -13,6 +14,14 @@ const UserManagement = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [axiosController, setAxiosController] = useState(new AbortController());
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
+
+    // Filter states
+    const [searchName, setSearchName] = useState('');
+    const [searchEmail, setSearchEmail] = useState('');
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const [isActive, setIsActive] = useState<boolean | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -24,6 +33,7 @@ const UserManagement = () => {
                         setError(result.message);
                     }
                     setUsers(result.data);
+                    setFilteredUsers(result.data);
                 }
             } catch (err: unknown) {
                 if (axios.isCancel(err)) {
@@ -46,6 +56,36 @@ const UserManagement = () => {
         };
     }, [axiosController]);
 
+// Filter users based on search and other filters
+    useEffect(() => {
+        let filtered = users;
+
+        // Filter by name
+        if (searchName) {
+            filtered = filtered.filter(user =>
+                user.name.toLowerCase().includes(searchName.toLowerCase())
+            );
+        }
+
+        // Filter by email
+        if (searchEmail) {
+            filtered = filtered.filter(user =>
+                user.email.toLowerCase().includes(searchEmail.toLowerCase())
+            );
+        }
+
+        // Filter by role
+        if (selectedRole) {
+            filtered = filtered.filter(user => user.role === selectedRole);
+        }
+
+        // Filter by active status
+        if (isActive !== null) {
+            filtered = filtered.filter(user => user.isActive === isActive);
+        }
+
+        setFilteredUsers(filtered);
+    }, [searchName, searchEmail, selectedRole, isActive, users]);
 
     const onChangeProductStatus = async (user: User, checked: boolean) => {
         try {
@@ -71,18 +111,55 @@ const UserManagement = () => {
                     <Accordion.Header>Filters</Accordion.Header>
                     <Accordion.Body>
                         <InputGroup className="mb-3">
-                            <FormControl placeholder="Search Users..."/>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                                    Filter by Role
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item href="#/action-1">All</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-2">Administrator</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-3">Vendor</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-4">CSR</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                            <Form layout="inline">
+                                <Form.Item>
+                                    <Input
+                                        placeholder="Search by name"
+                                        value={searchName}
+                                        onChange={(e) => setSearchName(e.target.value)}
+                                    />
+                                </Form.Item>
+
+                                <Form.Item>
+                                    <Input
+                                        placeholder="Search by email"
+                                        value={searchEmail}
+                                        onChange={(e) => setSearchEmail(e.target.value)}
+                                    />
+                                </Form.Item>
+
+                                <Form.Item>
+                                    <Select<Role | null>
+                                        placeholder="Select Role"
+                                        value={selectedRole}
+                                        onChange={(value) => setSelectedRole(value)}
+                                        style={{width: '200px'}}
+                                    >
+                                        <Select.Option value={null}>All Roles</Select.Option>
+                                        <Select.Option value={Role.admin}>Admin</Select.Option>
+                                        <Select.Option value={Role.vendor}>Vendor</Select.Option>
+                                        <Select.Option value={Role.csr}>CSR</Select.Option>
+                                        <Select.Option value={Role.customer}>Customer</Select.Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item>
+                                    <Checkbox
+                                        checked={isActive === true}
+                                        onChange={(e) => setIsActive(e.target.checked ? true : null)}
+                                    >
+                                        Active
+                                    </Checkbox>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Checkbox
+                                        checked={isActive === false}
+                                        onChange={(e) => setIsActive(e.target.checked ? false : null)}
+                                    >
+                                        Inactive
+                                    </Checkbox>
+                                </Form.Item>
+                            </Form>
                         </InputGroup>
                     </Accordion.Body>
                 </Accordion.Item>
@@ -100,7 +177,7 @@ const UserManagement = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <tr key={user.id}>
                         <td>
                             <div className="d-flex gap-2">

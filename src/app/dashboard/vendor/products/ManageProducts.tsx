@@ -1,5 +1,19 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Image, Input, message, Modal, Popconfirm, Select, Table, TableProps, Tag, Tooltip} from "antd";
+import {
+    Button,
+    Card,
+    Form,
+    Image,
+    Input,
+    message,
+    Modal,
+    Popconfirm,
+    Select,
+    Table,
+    TableProps,
+    Tag,
+    Tooltip
+} from "antd";
 import {Product, ProductStatus, statusColors} from "../../../../types/models/product.ts";
 import {ProductService} from "../../../../services/ProductService.ts";
 import axios from "axios";
@@ -8,6 +22,7 @@ import {useNavigate} from "react-router-dom";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import {useAuth} from "../../../../hooks/useAuth.tsx";
 import {Role} from "../../../../enums/auth.ts";
+import {Accordion, InputGroup} from 'react-bootstrap';
 
 
 const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean, filterOutOfStock?: boolean }) => {
@@ -21,6 +36,14 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
     const [axiosController, setAxiosController] = useState(new AbortController());
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+    // Filter states
+    const [searchName, setSearchName] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState<ProductStatus | "">("");
+    const [minPrice, setMinPrice] = useState<number | null>(null);
+    const [maxPrice, setMaxPrice] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -32,6 +55,7 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                         setError(result.message);
                     }
                     setProducts(result.data);
+                    setFilteredProducts(result.data);
                 }
             } catch (err: unknown) {
                 if (axios.isCancel(err)) {
@@ -54,6 +78,38 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
         };
     }, [axiosController, location.pathname]);
 
+    // Filter products based on search and other filters
+    useEffect(() => {
+        let filtered = products;
+
+        // Filter by name
+        if (searchName) {
+            filtered = filtered.filter((product) =>
+                product.name.toLowerCase().includes(searchName.toLowerCase())
+            );
+        }
+
+        // Filter by category
+        if (selectedCategory) {
+            filtered = filtered.filter((product) => product.categoryId === selectedCategory);
+        }
+
+        // Filter by status
+        if (selectedStatus) {
+            filtered = filtered.filter((product) => product.status === selectedStatus);
+        }
+
+        // Filter by price range
+        if (minPrice !== null) {
+            filtered = filtered.filter((product) => product.price >= minPrice);
+        }
+        if (maxPrice !== null) {
+            filtered = filtered.filter((product) => product.price <= maxPrice);
+        }
+
+        setFilteredProducts(filtered);
+    }, [searchName, selectedCategory, selectedStatus, minPrice, maxPrice, products]);
+
     const showStockModal = (product: Product) => {
         setIsModalOpen(true);
         setSelectedProduct(product);
@@ -71,6 +127,7 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
                         p.id === result.data.id ? result.data : p
                     )
                 );
+                setFilteredProducts(products)
             }
         } catch (e) {
             message.error('Error updating product stock');
@@ -254,7 +311,77 @@ const ManageProducts = ({isAdmin, filterOutOfStock = false}: { isAdmin?: boolean
     };
     return (
         <Card loading={loading} title="Manage Products">
-            <Table<Product> rowKey="id" columns={columns} dataSource={products}/>
+            {/* Filter Inputs */}
+            <Accordion defaultActiveKey="0" className="mb-4">
+                <Accordion.Item eventKey="0">
+                    <Accordion.Header>Filters</Accordion.Header>
+                    <Accordion.Body>
+                        <InputGroup className="mb-3">
+                            <Form layout="inline">
+                                <Form.Item>
+                                    <Input
+                                        type="text"
+                                        placeholder="Search by name"
+                                        value={searchName}
+                                        onChange={(e) => setSearchName(e.target.value)}
+                                    />
+                                </Form.Item>
+
+                                <Form.Item>
+                                    <Input
+                                        type="number"
+                                        placeholder="Min Price"
+                                        value={minPrice !== null ? minPrice : ''}
+                                        onChange={(e) => setMinPrice(e.target.value ? Number(e.target.value) : null)}
+                                    />
+                                </Form.Item>
+                                <Form.Item>
+                                    <Input
+                                        type="number"
+                                        placeholder="Max Price"
+                                        value={maxPrice !== null ? maxPrice : ''}
+                                        onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : null)}
+                                    />
+                                </Form.Item>
+                                <Form.Item>
+                                    <Select
+                                        value={selectedCategory}
+                                        onChange={(value) => setSelectedCategory(value)}
+                                    >
+                                        <option value="">All Categories</option>
+                                        {/* Add your category options here */}
+                                        {
+                                            Array.from(new Set(products.map(product => product.categoryId)))
+                                                .map(categoryId => (
+                                                    <option
+                                                        value={categoryId}
+                                                    >
+                                                        {products.find(p => p.categoryId === categoryId)?.category?.name}
+                                                    </option>)
+                                                )
+                                        }
+                                    </Select>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Select<ProductStatus | "">
+                                        value={selectedStatus}
+                                        onChange={(value, option) => setSelectedStatus(value)}
+                                    >
+                                        <option value="">All Statuses</option>
+                                        <option value={ProductStatus.Pending}>Pending</option>
+                                        <option value={ProductStatus.Active}>Active</option>
+                                        <option value={ProductStatus.Inactive}>Inactive</option>
+                                        <option value={ProductStatus.Rejected}>Rejected</option>
+                                    </Select>
+                                </Form.Item>
+                            </Form>
+
+
+                        </InputGroup>
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion>
+            <Table<Product> rowKey="id" columns={columns} dataSource={filteredProducts}/>
             {
                 selectedProduct &&
                 <Modal title="Manage Stock Items" open={isModalOpen} onOk={saveStock} onCancel={cancelStockEdit}>
