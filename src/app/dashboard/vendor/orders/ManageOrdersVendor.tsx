@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Input, message, Select, Table, TableProps, Tag} from "antd";
+import {Button, Card, Input, message, Modal, Select, Spin, Table, TableProps, Tag} from "antd";
 import {Order, OrderStatus, statusColors} from "../../../../types/models/Order.ts";
 import {OrderService} from "../../../../services/OrderService.ts";
 import axios from "axios";
@@ -9,6 +9,8 @@ import {Role} from "../../../../enums/auth.ts";
 import JsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {getCurrentDateTime} from "../../../../utils/date-time.ts";
+import {ProductService} from "../../../../services/ProductService.ts";
+import {Product} from "../../../../types/models/product.ts";
 
 const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
 
@@ -23,6 +25,9 @@ const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
 
     const [searchText, setSearchText] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null);
+    const [productLoading, setProductLoading] = useState<boolean>(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [isProductModalVisible, setIsProductModalVisible] = useState(false);
 
     const filteredOrders = orders.filter(order =>
         order.orderNumber.includes(searchText) &&
@@ -62,6 +67,27 @@ const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
             axiosController.abort("Component unmounted");
         };
     }, [axiosController]);
+
+    const showProductModal = async (productId: string) => {
+        if (productId !== selectedProduct?.id) {
+            try {
+                setProductLoading(true);
+                const response = await ProductService.getProductById(role, productId!);
+                if (response.success && response.data) {
+                    setSelectedProduct(response.data);
+                }
+            } catch (err) {
+                setSelectedProduct(null);
+                setError('Failed to load product.');
+            } finally {
+                setProductLoading(false);
+                setIsProductModalVisible(true);
+            }
+        } else {
+            setProductLoading(false);
+            setIsProductModalVisible(true);
+        }
+    };
 
     const columns: TableProps<Order>['columns'] = [
         {
@@ -122,7 +148,22 @@ const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
                             title: "Product",
                             dataIndex: "productId",
                             key: "productId",
-                            render: (_, item) => <span id={item.productId}>Product</span>
+                            render: (_, item) => (
+                                productLoading ?
+                                    (<Spin
+                                        size="small"
+                                        className="d-flex justify-content-center align-items-center min-vh-100"
+                                    />)
+                                    :
+                                    (<span
+                                        id={item.productId}
+                                        style={{color: 'blue', cursor: 'pointer'}}
+                                        onClick={() => showProductModal(item.productId)}
+                                        title="See Product Details"
+                                    >
+                                      {item.productId}
+                                    </span>)
+                            )
                         },
                         {
                             title: "Item Status",
@@ -211,6 +252,10 @@ const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
         generatePDF(orders);
     };
 
+    const closeProductModal = () => {
+        setIsProductModalVisible(false);
+    };
+
     return (
         <Card loading={loading} title="Manage Orders">
             <div className="d-flex justify-content-between mb-3">
@@ -241,6 +286,54 @@ const ManageOrdersVendor = ({isAdmin}: { isAdmin?: boolean }) => {
                 </div>
             </div>
             <Table<Order> rowKey="id" columns={columns} dataSource={filteredOrders}/>
+
+            <Modal
+                title="Product Details"
+                visible={isProductModalVisible}
+                onCancel={closeProductModal}
+                footer={[
+                    <Button key="close" onClick={closeProductModal}>
+                        Close
+                    </Button>,
+                ]}
+                width={600}
+            >
+                {selectedProduct ? (
+                    <div>
+                        <div style={{marginBottom: '20px'}}>
+                            {(selectedProduct.photos.length > 0) && (
+                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '10px'}}>
+                                    {selectedProduct.photos.map((photo, index) => (
+                                        <div key={index} style={{width: '25%'}}>
+                                            <img
+                                                src={photo}
+                                                alt={`product-photo-${index}`}
+                                                style={{width: '100%', height: 'auto', objectFit: 'cover'}}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <p><strong>Name:</strong> {selectedProduct.name}</p>
+                        <p><strong>Category:</strong> {selectedProduct.category?.name || 'N/A'}</p>
+                        <p><strong>Condition:</strong> {selectedProduct.condition}</p>
+                        <p><strong>Status:</strong> {selectedProduct.status}</p>
+                        <p><strong>Stock:</strong> {selectedProduct.stock}</p>
+                        <p><strong>SKU:</strong> {selectedProduct.sku}</p>
+                        <p><strong>Price:</strong> Rs.{selectedProduct.price}</p>
+                        <p><strong>Discount:</strong> RS.{selectedProduct.discount}</p>
+                        <p><strong>Weight:</strong> {selectedProduct.productWeight} g</p>
+                        <p>
+                            <strong>Dimensions:</strong> {selectedProduct.width} x {selectedProduct.height} x {selectedProduct.length} cm
+                        </p>
+                        <p><strong>Shipping Fee:</strong> Rs.{selectedProduct.shippingFee}</p>
+                    </div>
+                ) : (
+                    <p>No product selected.</p>
+                )}
+            </Modal>
         </Card>
     );
 };
